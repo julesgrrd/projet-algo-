@@ -8,5 +8,11 @@ namespace Projet_info
 {
     internal class Graphe
     {
-    }
+
+
+        public int[,] generematricerelation()
+        {
+            
+        }
+     }
 }
