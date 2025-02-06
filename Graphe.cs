@@ -12,11 +12,11 @@ namespace Projet_info
         public int[,] matrice_relation;
         public int[,] matrice_adjacence; 
 
-        public Graphe( int[,] matrice_relation, int[,] matrice_adjacence, string[] fichier) 
+        public Graphe( int[,] matrice_relation, int[,] matrice_adjacence, string[] tab) 
         {
             string fichier = "C:\\Users\\Jules\\OneDrive - De Vinci\\Documents\\Année 2\\Semestre 2\\info\\Projet info\\Association-soc-karate\\soc-karate.mtx";
-            this.string[] tab = File.ReadAllLines(fichier);
-            this.matrice_relation = Generematricerlation(tab);
+            this.tab = File.ReadAllLines(fichier);
+            this.matrice_relation = Generematricerelation(tab);
             this.matrice_adjacence = matrice_adjacence; 
         }
 
