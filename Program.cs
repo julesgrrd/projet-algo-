@@ -21,8 +21,13 @@
                 Console.WriteLine("Matrice extraite du fichier:");
                 for (int i = 0; i < matrice_relation.GetLength(0); i++)
                 {
-                    Console.WriteLine($"{matrice_relation[i, 0]} {matrice_relation[i, 1]}");
+                    for(int j=0; j<matrice_relation.GetLength(1); j++)
+                    {
+                        Console.Write(matrice_relation[i, j] + " ");
+                    }
+                    Console.WriteLine();
                 }
+                Console.ReadKey();
             }
         }
     }
