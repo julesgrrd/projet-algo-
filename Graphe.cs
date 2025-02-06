@@ -8,17 +8,20 @@ namespace Projet_info
 {
     internal class Graphe
     {
-        public int[,] matrice_relation = Generematricerlation();
+        public string[] tab;
+        public int[,] matrice_relation;
         public int[,] matrice_adjacence; 
 
-        Public Graphe( int[,] matrice_relation, int[,] matrice_adjacence ) 
+        public Graphe( int[,] matrice_relation, int[,] matrice_adjacence, string[] fichier) 
         {
-            this.matrice_relation = matrice_relation; 
+            string fichier = "C:\\Users\\Jules\\OneDrive - De Vinci\\Documents\\Année 2\\Semestre 2\\info\\Projet info\\Association-soc-karate\\soc-karate.mtx";
+            this.string[] tab = File.ReadAllLines(fichier);
+            this.matrice_relation = Generematricerlation(tab);
             this.matrice_adjacence = matrice_adjacence; 
         }
 
 
-        public int[,] Generematricerelation()
+        public int[,] Generematricerelation(string[] tab)
         {
                 string[] infoligne = tab.Skip(24).ToArray();
                 int[,] matrice_relation = new int[infoligne.Length, 2];
