@@ -12,26 +12,26 @@ class Program
 {
     static void Main()
     {
-        string filePath = "C:\\Users\\alexi\\OneDrive - De Vinci\\ESILV\\A2\\Problème scientifique informatique\\Compléments utiles pour le livrable 1  1er Mars-20250129\\soc-karate.mtxx";
+        string fichier = "C:\\Users\\alexi\\OneDrive - De Vinci\\ESILV\\A2\\Problème scientifique informatique\\Compléments utiles pour le livrable 1  1er Mars-20250129\\soc-karate.mtx";
 
-        // Lire toutes les lignes du fichier
-        string[] lines = File.ReadAllLines(filePath);
+        /// Lire toutes les lignes du fichier
+        string[] tab = File.ReadAllLines(fichier);
 
-        // Ignorer les 23 premières lignes et stocker les données à partir de la ligne 24
-        var dataLines = lines.Skip(23).ToArray();
+        /// Ignorer les 23 premières lignes et stocker les données à partir de la ligne 24
+        string[] infoligne = tab.Skip(24).ToArray();
 
-        // Initialiser la matrice avec le bon nombre de lignes
-        int[,] matrix = new int[dataLines.Length, 2];
+        /// Initialiser la matrice avec le bon nombre de lignes
+        int[,] matrice_relation = new int[infoligne.Length, 2];
 
-        // Remplir la matrice
-        for (int i = 0; i < dataLines.Length; i++)
+        /// Remplir la matrice
+        for (int i = 0; i < infoligne.Length; i++)
         {
-            string[] numbers = dataLines[i].Split(' ');
-            matrix[i, 0] = int.Parse(numbers[0]);  // Première colonne
-            matrix[i, 1] = int.Parse(numbers[1]);  // Deuxième colonne
+            string[] numbers = infoligne[i].Split(' ');
+            matrice_relation[i, 0] = Convert.ToInt32(numbers[0]);  /// Première colonne
+            matrice_relation[i, 1] = Convert.ToInt32(numbers[1]);  /// Deuxième colonne
         }
 
-        // Afficher la matrice pour vérification
+        /// Afficher la matrice pour vérification
         Console.WriteLine("Matrice extraite du fichier:");
         for (int i = 0; i < matrix.GetLength(0); i++)
         {
