@@ -12,7 +12,7 @@ class Program
 {
     static void Main()
     {
-        string filePath = "soc-karate.mtx";
+        string filePath = "C:\\Users\\alexi\\OneDrive - De Vinci\\ESILV\\A2\\Problème scientifique informatique\\Compléments utiles pour le livrable 1  1er Mars-20250129\\soc-karate.mtxx";
 
         // Lire toutes les lignes du fichier
         string[] lines = File.ReadAllLines(filePath);
