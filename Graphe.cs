@@ -10,14 +10,16 @@ namespace Projet_info
     {
         public string[] tab;
         public int[,] matrice_relation;
-        public int[,] matrice_adjacence; 
+        public int[,] matrice_adjacence;
+        public int[,] liste_adjacence;
 
-        public Graphe( int[,] matrice_relation, int[,] matrice_adjacence, string[] tab) 
+        public Graphe( int[,] matrice_relation, int[,] matrice_adjacence, string[] tab, int[,] liste_adjacence) 
         {
             string fichier = "..\\net7.0\\soc-karate.mtx";
             this.tab = File.ReadAllLines(fichier);
             this.matrice_relation = Generematricerelation(tab);
             this.matrice_adjacence = matrice_adjacence; 
+            this.liste_adjacence = liste_adjacence;
         }
 
 
