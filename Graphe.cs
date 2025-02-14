@@ -14,7 +14,7 @@ namespace Projet_info
 
         public Graphe( int[,] matrice_relation, int[,] matrice_adjacence, string[] tab) 
         {
-            string fichier = "C:\\Users\\Jules\\OneDrive - De Vinci\\Documents\\Année 2\\Semestre 2\\info\\Projet info\\Association-soc-karate\\soc-karate.mtx";
+            string fichier = "..\\net7.0\\soc-karate.mtx";
             this.tab = File.ReadAllLines(fichier);
             this.matrice_relation = Generematricerelation(tab);
             this.matrice_adjacence = matrice_adjacence; 
