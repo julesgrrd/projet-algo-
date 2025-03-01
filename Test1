@@ -113,9 +113,9 @@ namespace Problème_scientifique_informatique
             Noeud[] noeuds = new Noeud[ordre];
             for (int i = 0; i < ordre; i++)
             {
-                noeuds[i] = new Noeud(i, "blanc", listeAdjacence[i]);
+                noeuds[i] = new Noeud(i + 1, "blanc", listeAdjacence[i]);
             }
-            using (StringReader sr = new StringReader("1\n"))
+            using (StringReader sr = new StringReader("1"))
             {
                 Console.SetIn(sr);
                 List<int> resultat = g.ParcoursEnProfondeurDabord(noeuds);
@@ -124,6 +124,7 @@ namespace Problème_scientifique_informatique
                 Assert.AreEqual(parcoursAttendu.Count, resultatFiltre.Count);
                 CollectionAssert.AreEquivalent(parcoursAttendu, resultatFiltre);
             }
+            Console.SetIn(new StringReader("1"));
         }
 
 
@@ -143,7 +144,7 @@ namespace Problème_scientifique_informatique
             {
                 noeuds[i] = new Noeud(i + 1, "blanc", listeAdjacence[i]);
             }
-            using (StringReader sr = new StringReader("1\n"))
+            using (StringReader sr = new StringReader("1"))
             {
                 Console.SetIn(sr);
                 List<int> resultat = g.ParcoursEnLargeurDabord(noeuds);
@@ -152,6 +153,7 @@ namespace Problème_scientifique_informatique
                 Assert.AreEqual(parcoursAttendu.Count, resultatFiltre.Count);
                 CollectionAssert.AreEquivalent(parcoursAttendu, resultatFiltre);
             }
+            Console.SetIn(new StringReader("1"));
         }
 
     }
