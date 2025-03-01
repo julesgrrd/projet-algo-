@@ -1,0 +1,146 @@
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+
+namespace Problème_scientifique_informatique
+{
+    public class Visuel 
+    {
+        public List<int>[] ListeAdjacence;
+        private Random random = new Random();
+
+        public Visuel(List<int>[] ListeAdjacence)
+        {
+            this.ListeAdjacence = ListeAdjacence;
+        }
+
+        public void DessinerGraphe(string cheminFichier = "graphe.png")
+        {
+            int largeur = 1500;                    /// On définit les paramètre de la taille du graphe
+            int hauteur = 1500;  
+            int rayonNoeud = 40;
+            int distanceMin = 120;         /// distance minimale entre deux noeuds pour éviter le chevauchement
+
+
+            int nombreNoeuds = ListeAdjacence.Length;        /// On initialise le nombre de noeud du graphe
+
+            SKBitmap bitmap = new SKBitmap(largeur, hauteur);    /// On crée l'espace ou le graphe sera dessiné
+            using (SKCanvas canvas = new SKCanvas(bitmap))
+            {
+                canvas.Clear(SKColors.White);            
+
+                Dictionary<int, SKPoint> positions = new Dictionary<int, SKPoint>();              /// Va contenir la position de chacun des noeuds.
+                
+                HashSet<SKPoint> usedPositions = new HashSet<SKPoint>();    ///HashSet empêche d'avoir deux fois la même position donc deux noeuds au même endroit
+
+                                
+                for (int i = 0; i < nombreNoeuds; i++)
+                {
+                    SKPoint newPosition;
+                    bool positionValide;
+                    do
+                    {
+                        positionValide = true;
+                        int x = random.Next(rayonNoeud, largeur - rayonNoeud);
+                        int y = random.Next(rayonNoeud, hauteur - rayonNoeud);
+                        newPosition = new SKPoint(x, y);                                     /// on définit la position des noeuds de manière aléatoire.
+
+                        foreach (var pos in usedPositions)
+                        {
+                            float distance = (float)Math.Sqrt(Math.Pow(newPosition.X - pos.X, 2) + Math.Pow(newPosition.Y - pos.Y, 2));        /// On calcule la distance entre le centre du nouveau point et celui des points déjà existants.
+                            while (distance < distanceMin)                        /// Tant que cette distance est inférieur à la distance minimale autorisée, on calcul une nouvelle position.
+                            {
+                                newPosition.X += random.Next(-50, 50);
+                                newPosition.Y += random.Next(-50, 50);
+                                positionValide = false;
+                                distance = (float)Math.Sqrt(Math.Pow(newPosition.X - pos.X, 2) + Math.Pow(newPosition.Y - pos.Y, 2));    /// On calcul la nouvelle distance à partir du nouveau point et on compare à nouveau avec la distance minimale
+                            }
+                        }
+                        
+                    }
+                    while (usedPositions.Contains(newPosition) && positionValide == true);         /// Cela permet d'éviter les doublons
+                    
+                    positions[i] = newPosition;  
+                    usedPositions.Add(newPosition); /// on ajoute la nouvelle position à "usedPositions" pour pouvoir vérifier ensuite qu'il n'y aura pas de doublons de cette position.
+                    
+                }
+
+            
+                using (SKPaint paintArete = new SKPaint
+                {
+                    Color = SKColors.Black,
+                    StrokeWidth = 2,
+                })
+
+
+
+                using (SKPaint paintNoeud = new SKPaint                         /// ces trois fonctions "using" permettement de définir l'apparence des différents éléments
+                {                                                               /// du graphe (arête, noeud, texte) : couleur, taille, épaisseur du trait...
+                    Color = SKColors.Blue,
+                })
+
+
+
+                using (SKPaint paintTexte = new SKPaint
+                {
+                    Color = SKColors.White,
+                    TextSize = 40,
+                    TextAlign = SKTextAlign.Center        /// le texte sera centré dans le cercle représentant le noeud
+                })
+
+
+
+                {
+                    /// On dessine les arêtes
+                    for (int i = 1; i <= nombreNoeuds; i++)
+                    {
+                        foreach (int voisin in ListeAdjacence[i-1])
+                        {
+                            canvas.DrawLine(positions[i-1], positions[voisin-1], paintArete);
+                        }
+                    }
+
+
+                    /// On dessine les nœuds
+                    foreach (var kvp in positions)
+                    {
+                       
+                        int index = kvp.Key;
+                        SKPoint position = kvp.Value;
+                        canvas.DrawCircle(position, rayonNoeud, paintNoeud);                                    /// Le cercle représentant le noeud est dessiné
+                        canvas.DrawText((index+1).ToString(), position.X, position.Y + 7, paintTexte);          /// Le numéro du noeud est écrit au centre du cercle
+                        
+
+                     
+                    }
+                }
+            }
+
+            /// On sauvegarde l'image PNG
+            using (SKImage image = SKImage.FromBitmap(bitmap))
+            using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
+            using (System.IO.Stream stream = System.IO.File.OpenWrite(cheminFichier))
+            {
+                data.SaveTo(stream);
+            }
+
+            Console.WriteLine($"Graphe sauvegardé sous : {cheminFichier}");
+
+
+            ///On affiche l'image créée automatiquement
+            string imagePath = "graphe.png";   
+            Process.Start(new ProcessStartInfo(imagePath) { UseShellExecute = true });
+
+        }
+
+
+
+}
+}
