@@ -188,28 +188,29 @@ namespace Problème_scientifique_informatique
                         /// Le "if" suivant correspond à l'étude de l'existence de cycles
                         if (noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur == "jaune" && noeuds[Sommet - 1].listevoisins[i] != AvantDernier && cycle==false  && Sommet != AvantDernier)     
                         {
-                            
+    
                             int[] tabpile = pile.ToArray();          /// On converti la pile en tableau pour pouvoir isoler le cycle
-                            Array.Reverse(tabpile);                 
-                                                        
+                            Array.Reverse(tabpile);                  /// Nous inversons ce tableau afin de ne pas avoir à décrémenter dans les boucles à suivre, mais plutôt incrémenter.
+                                
                             for (int j=0; j<tabpile.Length; j++)               /// On parcours le tableau correspondant à la pile
                             {
-                                if(tabpile[j] == noeuds[Sommet - 1].listevoisins[i] && tabpile.Length - j>2)         
-                                {
-                                    nbelements=tabpile.Length - j;
-                                                                       
-                                    cycle = true;
-                                    n = j;
-                                    for (int k = 0; k < tabpile.Length - j; k++)
+                                if(tabpile[j] == noeuds[Sommet - 1].listevoisins[i] && tabpile.Length - j>2)      /// On chercher l'indice j du sommet à partir duquel le cycle commence (soit le sommet correspondant au voisin étudié). De plus, un cycle doit contenir stricement plus de deux sommets.  
                                     {
-                                        tabcycle[k] = tabpile[n];
-                                        n += 1;
+                                        nbelements=tabpile.Length - j;               /// le nombre d'éléments du cycle trouvé sera donc trouvé en calculant : taille de la pile - les chiffres précédent le sommet de début du cycle (ceux qui ne sont pas dans le cycle et qui sont au nombre de j)
+                                               
+                                        cycle = true;
+                                        n = j;
+                                        for (int k = 0; k < tabpile.Length - j; k++)         /// On rempli le tableau autant de fois qu'il y a d'éléments dans le cycle (la fin est à tabpile.Length-j car la pile à été inversé donc les éléments non-souhaités sont à la fin du tableau)
+                                        {
+                                            tabcycle[k] = tabpile[n];      /// Le tableau du cycle est rempli avec les bons éléments du tableau de la pile.
+                                            n += 1;
+                                        }
+                                        break;          /// Lorsque le tableau est rempli et que nous avons un cycle comme exemple, nous sortons de la boucle et continuons l'algorithme.
+            
                                     }
-                                    break;
-                                    
-                                }
                             }
-                        }
+                        }                  
+                                   
                         if (i < (noeuds[Sommet - 1].listevoisins.Count - 1))
                         {
                             continue;                                   /// Si le sommet voisin est jaune ou rouge mais qu'il existe un ou plusieurs autres sommets voisins alors on continue;
