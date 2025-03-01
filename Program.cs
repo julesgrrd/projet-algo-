@@ -20,6 +20,9 @@ namespace Problème_scientifique_informatique
                 return;
             }
 
+
+            /// Création de la matrice relation = matrice extraire du fichier
+            
             string[] tab = File.ReadAllLines(fichier);                 /// On lit le fichier
             string[] infoligne = tab.Skip(24).ToArray();               /// On isole la partie du fichier dont nous avons besoin, soit à partir de la ligne 25
             int [,] matrice_relation = new int[infoligne.Length, 2];           /// On crée donc une matrice à deux colonnes (noeud source, noeud destination)
@@ -40,6 +43,9 @@ namespace Problème_scientifique_informatique
                 Console.WriteLine();
             }
 
+
+            /// Appel des différentes fonctions du programme
+            
             Graphe graphe = new Graphe(matrice_relation);               /// On crée un graphe de la classe Graphe
             
 
