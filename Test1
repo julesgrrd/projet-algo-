@@ -115,7 +115,7 @@ namespace Problème_scientifique_informatique
             {
                 noeuds[i] = new Noeud(i + 1, "blanc", listeAdjacence[i]);
             }
-            using (StringReader sr = new StringReader("1"))
+            using (StringReader sr = new StringReader("1"))                           /// Le StringReader permet d'avoir une entrée au moment de la requête "Console.ReadLine" qui solicite l'utilisateur
             {
                 Console.SetIn(sr);
                 List<int> resultat = g.ParcoursEnProfondeurDabord(noeuds);
@@ -144,7 +144,7 @@ namespace Problème_scientifique_informatique
             {
                 noeuds[i] = new Noeud(i + 1, "blanc", listeAdjacence[i]);
             }
-            using (StringReader sr = new StringReader("1"))
+            using (StringReader sr = new StringReader("1"))                        /// Le StringReader permet d'avoir une entrée au moment de la requête "Console.ReadLine" qui solicite l'utilisateur
             {
                 Console.SetIn(sr);
                 List<int> resultat = g.ParcoursEnLargeurDabord(noeuds);
