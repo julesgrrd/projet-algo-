@@ -1,12 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
-namespace Projet_info
+namespace Problème_scientifique_informatique
 {
-    internal class Noeud
+    public class Noeud
     {
+        public int numeroNoeud;
+        public string couleur;
+        public List<int> listevoisins;
+
+        public Noeud(int numeroNoeud, string couleur, List<int> listevoisins)           /// on écrit le constructeur de la classe Noeud contenant les différents attributs de la classe.
+        {
+            this.numeroNoeud = numeroNoeud;
+            this.couleur = couleur;
+            this.listevoisins = listevoisins;
+        }
+
+        
+
     }
 }
