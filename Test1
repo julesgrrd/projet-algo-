@@ -1,6 +1,7 @@
-using Microsoft.Testing.Platform.Extensions.Messages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
-namespace Problème_scientifique_informatique
+namespace ProjetPSI
 {
     [TestClass]
     public sealed class Test1
@@ -14,8 +15,8 @@ namespace Problème_scientifique_informatique
         public void Test_Tailledugraphe()
         {
             int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
-            Graphe gra = new Graphe(matrice_relation);
-            int taille = gra.TailleDuGraphe(matrice_relation);
+            Graphe<int> graphe = new Graphe<int>(matrice_relation);
+            int taille = graphe.TailleDuGraphe(matrice_relation);
             Assert.AreEqual(5, taille);
 
         }
@@ -29,7 +30,7 @@ namespace Problème_scientifique_informatique
         public void Test_OrdreDuGraphe()
         {
             int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
-            Graphe graphe = new Graphe(matrice_relation);
+            Graphe<int> graphe = new Graphe<int>(matrice_relation);
             int result = graphe.OrdreDuGraphe(matrice_relation);
             Assert.AreEqual(4, result);
 
@@ -46,8 +47,8 @@ namespace Problème_scientifique_informatique
         {
             int[,] matrice_relation = { { 1, 3 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 2 } };
             int ordre = 5;
-            Graphe g = new Graphe(matrice_relation);
-            List<int>[] resultat = g.GenererListeAdjacence(matrice_relation, ordre);
+            Graphe <int> graphe = new Graphe<int>(matrice_relation);
+            List<int>[] resultat = graphe.GenererListeAdjacence(matrice_relation, ordre);
             Dictionary<int, List<int>> adjacenceAttendue = new Dictionary<int, List<int>>
             {
                 { 0, new List<int> { 3 } },
@@ -76,9 +77,9 @@ namespace Problème_scientifique_informatique
         {
             int[,] matrice_relation = { { 1, 3 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 2 } };
             int ordre = 5;
-            Graphe g = new Graphe(matrice_relation);
+            Graphe <int> graphe = new Graphe <int> (matrice_relation);
             List<int> parcours = new List<int> { 1, 2, 3, 4, 5 };
-            bool resultat = g.GrapheConnexe(parcours, ordre);
+            bool resultat = graphe.GrapheConnexe(parcours, ordre);
             Assert.IsTrue(resultat);
         }
 
@@ -92,9 +93,9 @@ namespace Problème_scientifique_informatique
         {
             int[,] matrice_relation = { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 2 } };
             int ordre = 4;
-            Graphe g = new Graphe(matrice_relation);
-            List<int>[] listeAdjacence = g.GenererListeAdjacence(matrice_relation, ordre);
-            bool resultat = g.GrapheOriente(listeAdjacence);
+            Graphe <int> graphe = new Graphe<int>(matrice_relation);
+            List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
+            bool resultat = graphe.GrapheOriente(listeAdjacence);
             Assert.IsTrue(resultat);
         }
 
@@ -108,17 +109,17 @@ namespace Problème_scientifique_informatique
         {
             int[,] matrice_relation = { { 1, 2 }, { 1, 3 }, { 2, 4 }, { 3, 5 }, { 4, 5 } };
             int ordre = 5;
-            Graphe g = new Graphe(matrice_relation);
-            List<int>[] listeAdjacence = g.GenererListeAdjacence(matrice_relation, ordre);
-            Noeud[] noeuds = new Noeud[ordre];
+            Graphe <int> graphe = new Graphe <int>(matrice_relation);
+            List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
+            Noeud<int>[] noeuds = new Noeud<int>[ordre];
             for (int i = 0; i < ordre; i++)
             {
-                noeuds[i] = new Noeud(i + 1, "blanc", listeAdjacence[i]);
+                noeuds[i] = new Noeud<int>(i + 1, "blanc", listeAdjacence[i]);
             }
             using (StringReader sr = new StringReader("1"))                           /// Le StringReader permet d'avoir une entrée au moment de la requête "Console.ReadLine" qui solicite l'utilisateur
             {
                 Console.SetIn(sr);
-                List<int> resultat = g.ParcoursEnProfondeurDabord(noeuds);
+                List<int> resultat = graphe.ParcoursEnProfondeurDabord(noeuds, matrice_relation);
                 List<int> resultatFiltre = resultat.Distinct().ToList();
                 List<int> parcoursAttendu = new List<int> { 1, 2, 4, 5, 3 };
                 Assert.AreEqual(parcoursAttendu.Count, resultatFiltre.Count);
@@ -137,17 +138,17 @@ namespace Problème_scientifique_informatique
         {
             int[,] matrice_relation = { { 1, 2 }, { 1, 3 }, { 2, 4 }, { 3, 5 }, { 4, 5 } };
             int ordre = 5;
-            Graphe g = new Graphe(matrice_relation);
-            List<int>[] listeAdjacence = g.GenererListeAdjacence(matrice_relation, ordre);
-            Noeud[] noeuds = new Noeud[ordre];
+            Graphe<int> graphe = new Graphe<int>(matrice_relation);
+            List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
+            Noeud<int>[] noeuds = new Noeud<int>[ordre];
             for (int i = 0; i < ordre; i++)
             {
-                noeuds[i] = new Noeud(i + 1, "blanc", listeAdjacence[i]);
+                noeuds[i] = new Noeud<int>(i + 1, "blanc", listeAdjacence[i]);
             }
             using (StringReader sr = new StringReader("1"))                        /// Le StringReader permet d'avoir une entrée au moment de la requête "Console.ReadLine" qui solicite l'utilisateur
             {
                 Console.SetIn(sr);
-                List<int> resultat = g.ParcoursEnLargeurDabord(noeuds);
+                List<int> resultat = graphe.ParcoursEnLargeurDabord(noeuds, matrice_relation);
                 List<int> resultatFiltre = resultat.Distinct().ToList();
                 List<int> parcoursAttendu = new List<int> { 1, 2, 3, 4, 5 };
                 Assert.AreEqual(parcoursAttendu.Count, resultatFiltre.Count);
