@@ -143,12 +143,12 @@ namespace ProjetPSI
             return MatriceAdjacence;
         }
 
-        public List<int> ParcoursEnProfondeurDabord(Noeud<T>[] noeuds, T[,]matrice_relation)
+        public List<int> ParcoursEnProfondeurDabord(Noeud<T>[] noeuds, int ordre)
         {
             List<int> SommetsVisites = new List<int>();      /// On crée la liste des sommets visités qui sera retournée à la fin du programme
 
             int SommetDepart = Convert.ToInt32(Console.ReadLine());           /// L'utilisateur saisi le sommet de départ
-            while (SommetDepart > matrice_relation.Length || SommetDepart <= 0)
+            while (SommetDepart > ordre || SommetDepart <= 0)
             {
                 Console.WriteLine("Le sommet n'est pas valide : il faut saisir un sommet existant");
                 SommetDepart = Convert.ToInt32(Console.ReadLine());           /// l'utilisateur saisi le sommet de départ jusqu'à ce qu'il soit valide
@@ -284,7 +284,7 @@ namespace ProjetPSI
 
 
 
-        public List<int> ParcoursEnLargeurDabord(Noeud<T>[] noeuds, T[,] matrice_relation)
+        public List<int> ParcoursEnLargeurDabord(Noeud<T>[] noeuds, int ordre)
         {
             List<int> SommetsVisites2 = new List<int>();                            /// On initialise la liste de Sommetvisités du parcours en largeur
             int SommetDepart = Convert.ToInt32(Console.ReadLine());
