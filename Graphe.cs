@@ -83,41 +83,58 @@ namespace ProjetPSI
 
 
 
-
-
         public List<int>[] GenererListeAdjacence(T[,] matrice_relation, int ordre)
+{
+    List<int>[] ListeAdjacence = new List<int>[ordre];       /// On crée un tableau de liste ou le nombre d'éléments du tableau sera l'ordre du graphe et à chaque éléments on associe une liste (liste de voisins)
+
+    for (int i = 0; i < ordre; i++)
+    {
+        ListeAdjacence[i] = new List<int>();                 /// On crée une liste pour chaque élément du tableau
+    }
+
+    int nbLigne = matrice_relation.GetLength(0);
+
+    for (int i = 0; i < nbLigne; i++)
+    {
+        int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
+        int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
+        int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
+
+        if (idStation1==0 || idStation2 ==0 || idStation1>ordre || idStation2 >ordre)
         {
-            List<int>[] ListeAdjacence = new List<int>[ordre];       /// On crée un tableau de liste ou le nombre d'éléments du tableau sera l'ordre du graphe et à chaque éléments on associe une liste (liste de voisins)
+            continue;
+        }
 
-            for (int i = 0; i < ordre; i++)
-            {
-                ListeAdjacence[i] = new List<int>();                 /// On crée une liste pour chaque élément du tableau
-            }
+        ListeAdjacence[idStation1 - 1].Add(idStation2);
 
-            for (int i = 0; i < matrice_relation.GetLength(0); i++)
-            {
+        if (doubleSens==1)
+        {
+            ListeAdjacence[idStation2 - 1].Add(idStation1);
+        }
+    }
 
-                ListeAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1].Add(Convert.ToInt32(matrice_relation[i, 1]));       /// On ajoute à la Liste d'adjacence du nombre de la colonne de gauche celui de la colonne de droite de la matrice_relation
-                ListeAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1].Add(Convert.ToInt32(matrice_relation[i, 0]));       /// On fait également l'inverse car le graphe est non-orienté donc les relations sont réciproques
-            }
+    Console.WriteLine("Liste d'adjacence :");               /// On l'affiche
+    for (int i = 0; i < ListeAdjacence.Length; i++)
+    {
+        Console.Write(i + 1 + ": ");
+        for (int j = 0; j < ListeAdjacence[i].Count; j++)
+        {
 
-            Console.WriteLine("Liste d'adjacence :");               /// On l'affiche
-            for (int i = 0; i < ListeAdjacence.Length; i++)
-            {
-                Console.Write(i + 1 + ": ");
-                for (int j = 0; j < ListeAdjacence[i].Count; j++)
-                {
-
-                    Console.Write(ListeAdjacence[i][j] + ",");
-
-                }
-                Console.WriteLine();
-            }
-
-
-            return ListeAdjacence;
+            Console.Write(ListeAdjacence[i][j] + ",");
 
         }
+        Console.WriteLine();
+    }
+
+
+    return ListeAdjacence;
+
+}
+
+
+
+
+
 
 
         public int[,] GenererMatriceAdjacence(T[,] matrice_relation, int ordre)
