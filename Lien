@@ -1,0 +1,25 @@
+using ProjetPSI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Projet_PSI
+{
+    public class Lien<T>
+    {
+        public Noeud<T> noeudDep { get; set; }
+        public Noeud<T> noeudArr { get; set; }
+
+        public T poids { get; set; }
+
+        public Lien(Noeud<T> noeudDep, Noeud<T> noeudArr, T poids)
+        {
+            this.noeudDep = noeudDep;
+            this.noeudArr = noeudArr;
+            this.poids = poids;
+        }
+
+    }
+}
