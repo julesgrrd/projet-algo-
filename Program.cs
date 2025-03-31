@@ -36,12 +36,14 @@ namespace ProjetPSI
                         int idStation = Convert.ToInt32(worksheet.Cells[ligne, 1].Value);
                         int idVoisin = Convert.ToInt32(worksheet.Cells[ligne, 3].Value);
                         int doubleSens = Convert.ToInt32(worksheet.Cells[ligne, 4].Value);
+                        int poids = Convert.ToInt32(worksheet.Cells[ligne, 5].Value);
 
                         if (idStation != null && idVoisin!= null)
                         {
                             matrice_relation[ligne - 2, 0] = idStation;
                             matrice_relation[ligne - 2, 1] = idVoisin;
                             matrice_relation[ligne - 2, 2] = doubleSens;
+                            matrice_relation[ligne - 2, 3] = poids;
                         }
                     }
                 }
