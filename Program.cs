@@ -29,17 +29,19 @@ namespace ProjetPSI
                 {
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
 
-                    matrice_relation = new int[worksheet.Dimension.End.Row - 2, 2];
+                    matrice_relation = new int[worksheet.Dimension.End.Row - 2, 3];
 
                     for (int ligne = 2; ligne < worksheet.Dimension.End.Row; ligne++)
                     {
                         int idStation = Convert.ToInt32(worksheet.Cells[ligne, 1].Value);
-                        int idVoisin = Convert.ToInt32(worksheet.Cells[ligne, 4].Value);
+                        int idVoisin = Convert.ToInt32(worksheet.Cells[ligne, 3].Value);
+                        int doubleSens = Convert.ToInt32(worksheet.Cells[ligne, 4].Value);
 
                         if (idStation != null && idVoisin!= null)
                         {
                             matrice_relation[ligne - 2, 0] = idStation;
                             matrice_relation[ligne - 2, 1] = idVoisin;
+                            matrice_relation[ligne - 2, 2] = doubleSens;
                         }
                     }
                 }
@@ -59,6 +61,10 @@ namespace ProjetPSI
             int ordre = GrapheMetro.OrdreDuGraphe(matrice_relation);
 
             GrapheMetro.GenererListeAdjacence(matrice_relation, ordre);
+
+            Visuel VisuelGraphe = new Visuel(GrapheMetro.GenererListeAdjacence(matrice_relation, ordre));
+
+            VisuelGraphe.DessinerGraphe();
         }
     }
 
