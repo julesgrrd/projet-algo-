@@ -61,7 +61,7 @@ namespace ProjetPSI
 
             static void SommaireMetro (string[] tableau_nomStation )
             {
-                Console.WriteLine("Bienvenue sur le SOMMAIRE des stations de métro. Chaque station de métro est associé à son identifiant.");
+                Console.WriteLine("\n*****Bienvenue sur le SOMMAIRE des stations de métro.*****\n Chaque station de métro est associée à son identifiant.");
                 for (int i = 1; i <= tableau_nomStation.Length; i++)
                 {
                     Console.WriteLine(i + " : " + tableau_nomStation[i - 1]);
