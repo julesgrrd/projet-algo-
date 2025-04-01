@@ -77,9 +77,42 @@ namespace ProjetPSI
 
             SommaireMetro(tableau_nomStation);
 
+            Noeud<int> [] noeuds = new Noeud<int> [ordre];          /// On initialise un tableau noeuds de Noeud.
+            for (int i = 0; i < ordre; i++)
+            {
+                noeuds[i] = new Noeud<int> (i, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
+            }
+
+            
             // Visuel VisuelGraphe = new Visuel(GrapheMetro.GenererListeAdjacence(matrice_relation, ordre));
 
             // VisuelGraphe.DessinerGraphe();
+
+
+            Lien<int>[,] liens = new Lien<int>[ordre, ordre];                     /// On initialise une matrice de lien qui contient autant de lien qu'il y en a dans la matrice relation et qui relie un sommet de départ a à un sommet d'arrivée b compris dans l'ordre du graphe
+            for(int a=0 ; a <ordre; a++)                                                       
+            {
+                for (int b=0; b<ordre; b++)   
+                {
+                    if (ListeAdjacence[a].Contains(b+1))                    /// Pour tout a et b, si le sommet b est un voisin de a, alors le lien existe
+                    {
+                        for (int h=0; h<matrice_relation.GetLength(0); h++)
+                        {
+                            if (matrice_relation[h, 0] == a+1 && matrice_relation[h, 1] == b+1)          /// on parcours la matrice relation à la recherche de la ligne correspondant au lien a-b avec donc le terme de la première colonne égale à a et celui de la deuxième égale à b
+                            {
+                                int aa = h;                                                         /// lorsqu'on trouve cette ligne, on note son indice
+                                liens[a, b] = new Lien<int>(noeuds[matrice_relation[aa, 0] - 1], noeuds[matrice_relation[aa, 1] - 1], matrice_relation[aa, 3]);              /// on peut maintenant associée à un lien un NOEUD de départ, un NOEUD d'arrivé, et le poids correspondant à ce lien.
+                                break; 
+                            }
+                        }
+            
+                    }
+        
+                }
+            }
+
+
+            
         }
     }
 
