@@ -14,10 +14,12 @@ namespace ProjetPSI
     public class Graphe <T>
     {
         public T[,] matrice_relation { get; set; }
+        public string[,] matrice_nomStation { get; set; }
 
-        public Graphe(T[,] matrice_relation)
+        public Graphe(T[,] matrice_relation, string[,] matrice_nomStation)
         {
             this.matrice_relation = matrice_relation;
+            this.matrice_nomStation = matrice_nomStation;
         }
 
         public int OrdreDuGraphe(T[,] matrice_relation)         /// L'ordre du graphe est le nombre de sommet qu'il contient
