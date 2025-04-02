@@ -185,7 +185,7 @@ namespace ProjetPSI
 }
 
 
-        static void SommaireMetro(string[,] matrice_nomStation)
+        public void SommaireMetro(string[,] matrice_nomStation)
 {
     Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");
     for (int i = 0; i < matrice_nomStation.GetLength(0); i++)
