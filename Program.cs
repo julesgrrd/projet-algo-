@@ -90,10 +90,18 @@ namespace ProjetPSI
 
 
             Noeud<int>[] noeuds = new Noeud<int>[ordre];          /// On initialise un tableau noeuds de Noeud.
-            for (int i = 0; i < ordre; i++)
-            {
-                noeuds[i] = new Noeud<int> (i+1, matrice_nomStation[i,1], "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
-            }
+for (int i = 0; i < ordre; i++)
+{
+    string nom = "";
+    for (int j=0; j<ordre; j++)
+    {
+        if (Convert.ToInt32(matrice_nomStation[j,0])==i+1)
+        {
+            nom = matrice_nomStation[j, 1];
+        }
+    }
+    noeuds[i] = new Noeud<int>(i + 1, nom, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
+}
 
 
             Lien<int>[,] liens = new Lien<int>[ordre, ordre];                     /// On initialise une matrice de lien qui contient autant de lien qu'il y en a dans la matrice relation et qui relie un sommet de départ a à un sommet d'arrivée b compris dans l'ordre du graphe
