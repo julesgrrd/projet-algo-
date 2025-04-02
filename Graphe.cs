@@ -158,7 +158,8 @@ namespace ProjetPSI
         }
     }
 
-    for (int i = 0; i < ordre; i++)
+
+    for (int i = 0; i < matrice_relation.GetLength(0); i++)
     {
         int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
         int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
@@ -185,8 +186,9 @@ namespace ProjetPSI
 }
 
 
-        public void SommaireMetro(string[,] matrice_nomStation)
+public void SommaireMetro(string[,] matrice_nomStation)
 {
+
     Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");
     for (int i = 0; i < matrice_nomStation.GetLength(0); i++)
     {
@@ -209,6 +211,117 @@ namespace ProjetPSI
         }
         Console.WriteLine();
     }
+}
+
+public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noeud<T>[] noeuds)
+{
+    List<int> PCC = new List<int>(); /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
+    int infini = 9999999;
+
+    Console.WriteLine("\nNous allons utiliser l'algorithme de Floyd-Warshall pour déterminer le chemin le plus court entre deux sommets.");
+
+    /// On demande à l'utilisateur s'il souhaite afficher de nouveau le sommaire, afin de trouver l'identifiant des stations
+    string reponse = "";
+    Console.WriteLine("\nSouhaitez-vous afficher le sommaire des stations de métro ? ");
+    do
+    {
+        Console.WriteLine("Entrez OUI ou NON : ");
+        reponse = Console.ReadLine().ToLower(); /// Permet de fonctionner si l'utilisateur écrit en minus
+    } while (reponse != "oui" && reponse != "non");
+
+    if (reponse == "oui")
+    {
+        SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
+    }
+
+    /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de départ et l'identifiant d'une station d'arrivée
+    int depart;
+    Console.WriteLine("\nSaisir le numéro de la station de départ en vous référant au sommaire : ");
+    depart = Convert.ToInt32(Console.ReadLine());
+    while (depart <= 0 || depart > ordre)
+    {
+        Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station de départ en vous référant au sommaire : ");
+        depart = Convert.ToInt32(Console.ReadLine());
+    }
+
+    int arrivee;
+    Console.WriteLine("\nSaisir le numéro de la station d'arrivée en vous référant au sommaire : ");
+    arrivee = Convert.ToInt32(Console.ReadLine());
+    while (arrivee <= 0 || arrivee > ordre)
+    {
+        Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station d'arrivee en vous référant au sommaire : ");
+        arrivee = Convert.ToInt32(Console.ReadLine());
+    }
+
+
+    int[,] distance = new int[ordre, ordre];
+    int[,] predecesseur = new int[ordre, ordre];
+
+    
+    for (int i=0; i<ordre; i++)
+    {
+        for (int j=0; j<ordre; j++)
+        {
+            distance[i, j] = matriceAdjacence[i, j];
+
+            if (matriceAdjacence[i,j] == infini || i==j)
+            {
+                predecesseur[i, j] = -1;
+            } else
+            {
+                predecesseur[i, j] = i;
+            }
+        }
+    }
+
+    for (int k=0; k<ordre; k++)
+    {
+        for (int i=0; i<ordre; i++)
+        {
+            for (int j=0; j<ordre; j++)
+            {
+                if (distance[i,k] != infini && distance[k,j] != infini && distance[i,k] + distance[k,j] < distance[i,j])
+                {
+                    distance[i, j] = distance[i, k] + distance[k, j];
+                    predecesseur[i, j] = predecesseur[k, j];
+                }
+            }
+        }
+    }
+
+    int stationActuelle = arrivee - 1;
+    if (predecesseur[depart-1, arrivee-1] == -1)
+    {
+        Console.WriteLine("Aucun chemin n'existe pour relier ces deux stations");
+    } else
+    {
+        while (stationActuelle !=-1)
+        {
+            PCC.Insert(0, stationActuelle + 1);
+            stationActuelle = predecesseur[depart - 1, stationActuelle];
+        }
+
+        /// Calcul du poids total du PCC
+        int poidsTotal = 0;
+        for (int i=0; i<PCC.Count-1; i++)
+        {
+            int station1 = PCC[i] - 1;
+            int station2 = PCC[i + 1] - 1;
+        }
+        /// On affiche le chemin du chemin le plus court, avec le temps total
+        Console.WriteLine("\nLe chemin le plus court entre la station de métro numéro " + depart + " : " + noeuds[depart - 1].nom + " et la station numéro " + arrivee + " : " + noeuds[arrivee - 1].nom + " est : ");
+        for (int i=0; i<PCC.Count; i++)
+        {
+            Console.Write(noeuds[PCC[i] - 1].nom);
+            if (i<PCC.Count -1)
+            {
+                Console.Write(" --> ");
+            }
+        }
+        Console.WriteLine();
+    }
+
+    return PCC;
 }
 
         public List<int> ParcoursEnProfondeurDabord(Noeud<T>[] noeuds, int ordre)
