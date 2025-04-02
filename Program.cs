@@ -62,29 +62,7 @@ namespace ProjetPSI
             }
 
 
-            static void SommaireMetro(string[,] matrice_nomStation)
-            {
-                Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");
-                for (int i = 0; i <matrice_nomStation.GetLength(0); i++)
-                {
-                    for (int j=0; j<matrice_nomStation.GetLength(1);j++)
-                    {
-                        if (Convert.ToInt32(matrice_nomStation[i,0])<10)
-                        {
-                            Console.Write(matrice_nomStation[i, j] + "   ");
-                        } else if (Convert.ToInt32(matrice_nomStation[i, 0]) < 100)
-                        {
-                            Console.Write(matrice_nomStation[i, j] + "  ");
-                        } else
-                        {
-                            Console.Write(matrice_nomStation[i, j] + " ");
-                        }
-
-
-                    }
-                    Console.WriteLine();
-                }
-            }
+            
 
             Graphe<int> GrapheMetro = new Graphe<int>(matrice_relation);
 
@@ -103,7 +81,7 @@ namespace ProjetPSI
             bool Oriente = GrapheMetro.GrapheOriente(ListeAdjacence);
             int[,] MatriceAdjacence = GrapheMetro.GenererMatriceAdjacence(matrice_relation, 5);
 
-            SommaireMetro(matrice_nomStation);
+            graphe.SommaireMetro(matrice_nomStation);
 
             //Visuel VisuelGraphe = new Visuel(GrapheMetro.GenererListeAdjacence(matrice_relation, ordre));
 
