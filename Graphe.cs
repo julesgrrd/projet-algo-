@@ -138,27 +138,76 @@ namespace ProjetPSI
 
 
         public int[,] GenererMatriceAdjacence(T[,] matrice_relation, int ordre)
+{
+    int[,] MatriceAdjacence = new int[ordre, ordre];                /// On crée une matrice d'adjacence de même largeur et hauteur correspondant à l'ordre du graphe
+    int infini = 9999999;
+
+    for (int i=0; i<ordre; i++)
+    {
+        for (int j=0; j<ordre; j++)
         {
-            int[,] MatriceAdjacence = new int[ordre, ordre];                /// On crée une matrice d'adjacence de même largeur et hauteur correspondant à l'ordre du graphe
-            for (int i = 0; i < matrice_relation.GetLength(0); i++)
+            if (i == j)
             {
-                MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = 1;     /// on rempli la matrice grâce à la matrice relation : on met des 1 lorsque les sommets i et j sont voisins.
-                MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1, Convert.ToInt32(matrice_relation[i, 0]) - 1] = 1;
-            }
-
-            Console.WriteLine("Matrice d'adjacence :");    /// On l'affiche
-            for (int i = 0; i < ordre; i++)
+                MatriceAdjacence[i, j] = 0;
+            } else
             {
-                for (int j = 0; j < ordre; j++)
-                {
-                    Console.Write(MatriceAdjacence[i, j] + " ");
-                }
-                Console.WriteLine();
+                MatriceAdjacence[i, j] = infini;
             }
-
-
-            return MatriceAdjacence;
         }
+    }
+
+    for (int i = 0; i < ordre; i++)
+    {
+        int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
+        int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
+        int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
+        int poids = Convert.ToInt32(matrice_relation[i, 3]);
+
+        if (idStation1 == 0 || idStation2 == 0 || idStation1 > ordre || idStation2 > ordre)
+        {
+            continue;
+        }
+
+        if (doubleSens==1)
+        {
+            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     /// on rempli la matrice grâce à la matrice relation : on met des 1 lorsque les sommets i et j sont voisins.
+            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1, Convert.ToInt32(matrice_relation[i, 0]) - 1] = poids;
+        } else
+        {
+            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;
+        }
+       
+    }
+
+    return MatriceAdjacence;
+}
+
+
+        static void SommaireMetro(string[,] matrice_nomStation)
+{
+    Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");
+    for (int i = 0; i < matrice_nomStation.GetLength(0); i++)
+    {
+        for (int j = 0; j < matrice_nomStation.GetLength(1); j++)
+        {
+            if (Convert.ToInt32(matrice_nomStation[i, 0]) < 10)
+            {
+                Console.Write(matrice_nomStation[i, j] + "   ");
+            }
+            else if (Convert.ToInt32(matrice_nomStation[i, 0]) < 100)
+            {
+                Console.Write(matrice_nomStation[i, j] + "  ");
+            }
+            else
+            {
+                Console.Write(matrice_nomStation[i, j] + " ");
+            }
+
+
+        }
+        Console.WriteLine();
+    }
+}
 
         public List<int> ParcoursEnProfondeurDabord(Noeud<T>[] noeuds, int ordre)
         {
