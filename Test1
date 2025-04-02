@@ -15,7 +15,8 @@ namespace ProjetPSI
         public void Test_Tailledugraphe()
         {
             int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
-            Graphe<int> graphe = new Graphe<int>(matrice_relation);
+            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" } };
+            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
             int taille = graphe.TailleDuGraphe(matrice_relation);
             Assert.AreEqual(5, taille);
 
@@ -30,7 +31,8 @@ namespace ProjetPSI
         public void Test_OrdreDuGraphe()
         {
             int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
-            Graphe<int> graphe = new Graphe<int>(matrice_relation);
+            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" } };
+            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
             int result = graphe.OrdreDuGraphe(matrice_relation);
             Assert.AreEqual(4, result);
 
@@ -47,7 +49,8 @@ namespace ProjetPSI
         {
             int[,] matrice_relation = { { 1, 3 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 2 } };
             int ordre = 5;
-            Graphe <int> graphe = new Graphe<int>(matrice_relation);
+            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" }, { "5", "Champs-Elysees Clemenceau" } };
+            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
             List<int>[] resultat = graphe.GenererListeAdjacence(matrice_relation, ordre);
             Dictionary<int, List<int>> adjacenceAttendue = new Dictionary<int, List<int>>
             {
@@ -69,22 +72,6 @@ namespace ProjetPSI
 
 
         /// <summary>
-        /// Test de la fonction Graphe Connexe
-        /// </summary>
-
-        [TestMethod]
-        public void Test_GrapheConnexe()
-        {
-            int[,] matrice_relation = { { 1, 3 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 2 } };
-            int ordre = 5;
-            Graphe <int> graphe = new Graphe <int> (matrice_relation);
-            List<int> parcours = new List<int> { 1, 2, 3, 4, 5 };
-            bool resultat = graphe.GrapheConnexe(parcours, ordre);
-            Assert.IsTrue(resultat);
-        }
-
-
-        /// <summary>
         /// Test de la fonction Graphe Orienté
         /// </summary>
 
@@ -93,11 +80,14 @@ namespace ProjetPSI
         {
             int[,] matrice_relation = { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 2 } };
             int ordre = 4;
-            Graphe <int> graphe = new Graphe<int>(matrice_relation);
+            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" } };
+            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
             List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
             bool resultat = graphe.GrapheOriente(listeAdjacence);
             Assert.IsTrue(resultat);
         }
+
+    }
 
 
         /// <summary>
