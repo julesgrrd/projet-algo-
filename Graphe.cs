@@ -657,3 +657,141 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
     return CheminLePlusCourt;
 }
+
+
+
+
+        public List<int> AlgorithmeBellmanFord(Noeud<T>[] noeuds, int ordre, int[,] matriceAdjacence )
+        {
+            List<int> CheminLePlusCourt = new List<int>();                           /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
+            Console.WriteLine("Nous allons utiliser l'algorithme de Bellman-Ford pour déterminer le chemin le plus court entre deux sommet.");
+
+            /// On demande à l'utilisateur s'il souhaite afficher de nouveau le sommaire, afin de trouver l'identifiant des stations
+            string reponse = "";
+            Console.WriteLine("\nSouhaitez-vous afficher le sommaire des stations de métro ? ");
+            do
+            {
+                Console.WriteLine("Entrez OUI ou NON : ");
+                reponse = Console.ReadLine().ToLower(); /// Permet de fonctionner si l'utilisateur écrit en minus
+            } while (reponse != "oui" && reponse != "non");
+
+            if (reponse == "oui")
+            {
+                SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
+            }
+
+            /// On demande à l'utilisateur une station de départ et une station d'arrivée.
+            Console.WriteLine("Saisir le numéro de la station de départ en vous référant au sommaire :");
+            int départ = Convert.ToInt32(Console.ReadLine());
+            while (départ > ordre || départ <= 0)
+            {
+                Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station de départ jusqu'à ce qu'elle soit valide
+                départ = Convert.ToInt32(Console.ReadLine());
+            }
+
+            Console.WriteLine("Saisir le numéro de la station d'arrivée en vous référant au sommaire :");
+            int arrivée = Convert.ToInt32(Console.ReadLine());
+            while (arrivée > ordre || arrivée <= 0)
+            {
+                Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station d'arrivée jusqu'à ce qu'elle soit valide
+                arrivée = Convert.ToInt32(Console.ReadLine());
+            }
+
+            int infini = 999999999;
+            
+
+            int[] distance = new int[ordre];
+            int[] predecesseur = new int[ordre];
+
+            for (int i = 0; i < ordre; i++)                                      /// Cette étape correspond au remplissage de la première ligne du tableau du l'algorithme de Dijkstra : on rempli les cases de distances des sommets adjacents avec le poids, les autres somemts restent à une distance +oo
+            {
+                distance[i] = infini;
+                predecesseur[i] = -1;
+            }
+            distance[départ - 1] = 0;
+
+            
+
+            for (int i = 0; i < ordre - 1; i++)  /// Le nombre d'itération sera limité au nombre d'ar^tes du graphe
+            {
+                for (int j = 1; j <= ordre; j++)
+                {
+                    for (int h = 0; h < noeuds[j-1].listevoisins.Count; h++)
+                    {
+                        int voisin = noeuds[j-1].listevoisins[h] - 1;
+                        if (Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j-1, voisin] < distance[voisin])
+                        {
+                            distance[voisin] = Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin];
+                            predecesseur[voisin] = j - 1;
+                        }
+                    }
+                }
+            }
+
+            /// Pour que l'algorithme de Bellmann-Ford puisse s'appliquer, il faut s'assurer qu'il n'y pas de cycle absorbant
+            /// vérification de l'inexistance de cycle de poids strictement négatifs en fin d'algorithme:
+            /// Il s'agit en fait de refaire une dernière itération et de voir si les distances changent
+            
+            for (int j = 1; j <= ordre; j++)
+            {
+                for (int h = 0; h < noeuds[j - 1].listevoisins.Count; h++)
+                {
+                    int voisin = noeuds[j - 1].listevoisins[h] - 1;
+                    if (Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin] < distance[voisin])
+                    {
+                        Console.WriteLine(" Il y a un circuit de poids négatif. ");
+                        CheminLePlusCourt = null;       /// Si il y a un cycle absorbant, l'algorithme ne fonctionne pas donc nous mettons le CheminLePlusCourt à null
+                    }
+                }
+            }
+
+            /// Nous allons maintenant afficher le chemin le plus court en reconstruisant la liste des predecesseurs.
+
+            int SommetArr = arrivée - 1;
+            while (SommetArr != -1)
+            {
+                CheminLePlusCourt.Insert(0, SommetArr + 1);
+                SommetArr = predecesseur[SommetArr];
+            }
+
+          
+
+            /// On calcule le temps du trajet
+            int tempsTotal = 0;
+            for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)
+            {
+                int stationInitiale = CheminLePlusCourt[i] - 1;
+                int stationSuivante = CheminLePlusCourt[i + 1] - 1;
+                tempsTotal += matriceAdjacence[stationInitiale, stationSuivante];    /// A chaque itération, on chercher le temps entre les deux stations dans la matrice d'adjacence.
+            }
+
+
+
+            ///On affiche le chemin le plus court
+            Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ - 1].nom + " (n°" + noeuds[départ - 1].idNoeud + ") et la station de métro " + noeuds[arrivée - 1].nom + " (n°" + noeuds[arrivée - 1].idNoeud + ") est le trajet : ");
+            for (int i = 0; i < CheminLePlusCourt.Count; i++)
+            {
+                if (i == CheminLePlusCourt.Count - 1)
+                {
+                    Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom);
+                }
+                else
+                {
+                    Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en transformant la associant chaque élément de la liste de chiffre obtenue à son nom de station.
+                }
+
+            }
+            Console.WriteLine();
+            Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");
+
+
+
+            for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
+            {
+                noeuds[i].couleur = "blanc";
+            }
+             
+
+            return CheminLePlusCourt;
+        }
+
