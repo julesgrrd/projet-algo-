@@ -516,7 +516,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
 
 
- public List<int> AlgorithmeDijkstra(Noeud<T>[] noeuds, int[,] matriceAdjacence, int ordre)
+         public List<int> AlgorithmeDijkstra(Noeud<T>[] noeuds, int[,] matriceAdjacence, int ordre)
 {
     List<int> CheminLePlusCourt = new List<int>();                           /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
     Console.WriteLine("Nous allons utiliser l'algorithme de Dijkstra pour déterminer le chemin le plus court entre deux sommet.");
