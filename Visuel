@@ -1,4 +1,4 @@
-using SkiaSharp;
+ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -86,7 +86,7 @@ namespace ProjetPSI
                 if (s1 == null || s2 == null) continue;
 
                 /// Permet de placer les stations sur l'image en fonction de la latitude et de la longitude de chacune
-                var p1 = ConvertirCoordonnees(s1.longitude, s1.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);   
+                var p1 = ConvertirCoordonnees(s1.longitude, s1.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
                 var p2 = ConvertirCoordonnees(s2.longitude, s2.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
 
                 canvas.DrawLine(p1, p2, paintLigne);    /// Trace le trait entre la station p1 et la station p2
@@ -133,15 +133,15 @@ namespace ProjetPSI
         private SKPoint ConvertirCoordonnees(double lon, double lat, double minLon, double minLat, double maxLon, double maxLat, int largeur, int hauteur)
         {
             float padding = 50f;  /// Marge autour du plan
-            float x = padding + (float)((lon - minLon) / (maxLon-minLon) * (largeur - 2 * padding));
-            float y = padding + (float)((maxLat - lat) / (maxLat-minLat) * (hauteur - 2 * padding));
+            float x = padding + (float)((lon - minLon) / (maxLon - minLon) * (largeur - 2 * padding));
+            float y = padding + (float)((maxLat - lat) / (maxLat - minLat) * (hauteur - 2 * padding));
             return new SKPoint(x, y);
         }
 
         /// Propriété utilisée dans les calculs de coordonnées pour calculer et retourner la latitude maximale parmi toutes les stations
         private double maxLat => stations.Max(s => s.latitude);
 
- 
+
 
 
     }
