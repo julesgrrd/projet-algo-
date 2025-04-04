@@ -79,6 +79,7 @@ namespace ProjetPSI
             int ordre = GrapheMetro.OrdreDuGraphe(matrice_relation);    /// On appelle la fonction OrdreDuGraphe pour obtenir l'ordre du graphe
             int taille = GrapheMetro.TailleDuGraphe(matrice_relation);    /// On appelle la fonction TailleDuGraphe pour obtenir la taille du graphe
             List<int>[] ListeAdjacence = GrapheMetro.GenererListeAdjacence(matrice_relation, ordre);    /// On appelle la fonction ListeAdjacence pour obtenir la liste d'adjacence du graphe
+            bool orienté = GrapheMetro.GrapheOriente(ListeAdjacence);    /// On appelle la fonction GrapheOriente pour savoir si c'est orienté
             int[,] MatriceAdjacence = GrapheMetro.GenererMatriceAdjacence(matrice_relation, ordre);    /// On appelle la fonction MatriceAdjacence pour obtenir la matrice d'adjacence du graphe
 
             GrapheMetro.SommaireMetro(matrice_infoStation);    /// On appelle la fonction SommaireMetro qui permet d'afficher le sommaire des stations de métro avec leur identifant et nom
