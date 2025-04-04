@@ -77,9 +77,9 @@ namespace ProjetPSI
 
             GrapheMetro.SommaireMetro(matrice_infoStation);
 
-            Noeud<int>[] noeuds = new Noeud<int>[ordre];          /// On initialise un tableau noeuds de Noeud.
 
-
+            /// Tableau de noeuds pour la visualisation
+            Noeud<int>[] noeudsVisuel = new Noeud<int>[ordre];          /// On initialise un tableau noeuds de Noeud.
             for(int i = 0; i < ordre; i++)
             {
                 double longitude = 0;
@@ -90,8 +90,25 @@ namespace ProjetPSI
                 longitude = double.Parse(matrice_infoStation[i, 2]);
                 latitude = double.Parse(matrice_infoStation[i, 3]);
 
-                noeuds[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ListeAdjacence[i]);
+                noeudsVisuel[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ListeAdjacence[i]);
             }
+
+
+            /// tableau de noeuds pour les algorithmes
+            Noeud<int> [] noeuds = new Noeud<int> [ordre];          /// On initialise un tableau noeuds de Noeud.
+            for (int i = 0; i < ordre; i++)
+            {
+                string nom = "";
+                for (int j = 0; j < ordre; j++)
+                {
+                    if (Convert.ToInt32(matrice_nomStation[j, 0]) == i + 1)
+                    {
+                        nom = matrice_nomStation[j, 1];
+                    }
+                }
+                noeuds[i] = new Noeud<int> (i+1, nom, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
+            }
+
 
             Visuel visuel = new Visuel(noeuds, matrice_relation);
             visuel.GenererCarte("metro.png");
