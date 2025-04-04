@@ -323,198 +323,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
     return PCC;
 }
-
-        public List<int> ParcoursEnProfondeurDabord(Noeud<T>[] noeuds, int ordre)
-        {
-            List<int> SommetsVisites = new List<int>();      /// On crée la liste des sommets visités qui sera retournée à la fin du programme
-
-            int SommetDepart = Convert.ToInt32(Console.ReadLine());           /// L'utilisateur saisi le sommet de départ
-            while (SommetDepart > ordre || SommetDepart <= 0)
-            {
-                Console.WriteLine("Le sommet n'est pas valide : il faut saisir un sommet existant");
-                SommetDepart = Convert.ToInt32(Console.ReadLine());           /// l'utilisateur saisi le sommet de départ jusqu'à ce qu'il soit valide
-            }
-
-
-            Stack<int> pile = new Stack<int>();           /// On créé la pile qui va stocker les sommets visités et on y ajoute le sommet de départ.
-            pile.Push(SommetDepart);
-
-
-            noeuds[SommetDepart - 1].couleur = "jaune";       /// Le sommet de départ passe en jaune
-            int Sommet = SommetDepart;
-
-            int AvantDernier = SommetDepart;                  /// On crée une variable qui stocke l'avant dernier sommet parcouru : cela sera utile pour étudier l'existence de cycles
-            bool cycle = false;
-            int[] tabcycle = new int[noeuds.Length];       /// le tableau de cycle crée permettra de renvoyer un exemple de cycle
-            int nbelements = 0;
-            int n = 0;
-
-            while (pile.Count != 0)                         /// l'algorithme s'arrêtera quand la pile sera vide
-            {
-                SommetsVisites.Add(Sommet);
-                for (int i = 0; i < noeuds[Sommet - 1].listevoisins.Count; i++)           /// On parcours la liste d'adjacence du Sommet actuel (donc la liste de voisins)
-                {
-                    if (noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur == "blanc")           ///Si le voisin regardé est blanc alors :
-                    {
-                        AvantDernier = pile.Peek();
-                        pile.Push(noeuds[Sommet - 1].listevoisins[i]);                               /// on l'ajoute à la pile
-                        noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur = "jaune";            /// il devient jaune
-                        Sommet = noeuds[Sommet - 1].listevoisins[i];                                 /// il devient le nouveau Sommet actuel
-
-                        break;                                                                       /// on sort de la boucle pour étudier ses voisins à lui et ainsi de suite
-                    }
-                    else if (noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur == "jaune" || noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur == "rouge")
-                    {
-                        /// Le "if" suivant correspond à l'étude de l'existence de cycles
-                        if (noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur == "jaune" && noeuds[Sommet - 1].listevoisins[i] != AvantDernier && cycle == false && Sommet != AvantDernier)
-                        {
-
-                            int[] tabpile = pile.ToArray();          /// On converti la pile en tableau pour pouvoir isoler le cycle
-                            Array.Reverse(tabpile);                  /// Nous inversons ce tableau afin de ne pas avoir à décrémenter dans les boucles à suivre, mais plutôt incrémenter.
-
-                            for (int j = 0; j < tabpile.Length; j++)               /// On parcours le tableau correspondant à la pile
-                            {
-                                if (tabpile[j] == noeuds[Sommet - 1].listevoisins[i] && tabpile.Length - j > 2)      /// On chercher l'indice j du sommet à partir duquel le cycle commence (soit le sommet correspondant au voisin étudié). De plus, un cycle doit contenir stricement plus de deux sommets.  
-                                {
-                                    nbelements = tabpile.Length - j;               /// le nombre d'éléments du cycle trouvé sera donc trouvé en calculant : taille de la pile - les chiffres précédent le sommet de début du cycle (ceux qui ne sont pas dans le cycle et qui sont au nombre de j)
-
-                                    cycle = true;
-                                    n = j;
-                                    for (int k = 0; k < tabpile.Length - j; k++)         /// On rempli le tableau autant de fois qu'il y a d'éléments dans le cycle (la fin est à tabpile.Length-j car la pile à été inversé donc les éléments non-souhaités sont à la fin du tableau)
-                                    {
-                                        tabcycle[k] = tabpile[n];      /// Le tableau du cycle est rempli avec les bons éléments du tableau de la pile.
-                                        n += 1;
-                                    }
-                                    break;          /// Lorsque le tableau est rempli et que nous avons un cycle comme exemple, nous sortons de la boucle et continuons l'algorithme.
-
-                                }
-                            }
-                        }
-
-                        if (i < (noeuds[Sommet - 1].listevoisins.Count - 1))
-                        {
-                            continue;                                   /// Si le sommet voisin est jaune ou rouge mais qu'il existe un ou plusieurs autres sommets voisins alors on continue;
-                        }
-                        else
-                        {
-                            noeuds[Sommet - 1].couleur = "rouge";        /// Si tous les sommets voisins du Sommet sont jaunes ou rouges alors le sommet actuel passe en rouge car il a fini d'être étudié.
-                            pile.Pop();                                  /// Il est donc retiré de la pile (il sera à ce moment la en haut de la pile donc pile.Pop qui retire le premier élément de la pile permet d'effectuer cette action).
-                            if (pile.Count != 0)
-                            {
-                                Sommet = pile.Peek();                    ///Si la pile n'est pas vide à la fin de la boucle, alors le premier élément de la pile devient le nouveau sommet.
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-            Console.Write(SommetsVisites[0]);
-            for (int i = 1; i < SommetsVisites.Count; i++)
-            {
-                Console.Write(" ; " + SommetsVisites[i]);               /// On affiche la liste des sommets visités, soit le chemin complet de parcours du graphe.
-            }
-            Console.WriteLine();
-
-
-            if (cycle == true)
-            {
-                Console.Write("Il existe un cycle, par exemple : ");
-                for (int i = 0; i < nbelements; i++)
-                {
-                    Console.Write(tabcycle[i] + " ");         /// Si il y a un cycle, on affiche le tableau contenant l'exemple de cycle
-                }
-            }
-            else { Console.WriteLine("Il n'existe pas de cycle"); }
-
-
-            for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
-            {
-                noeuds[i].couleur = "blanc";
-            }
-
-            return SommetsVisites;
-        }
-
-
-        public bool GrapheConnexe(List<int> SommetsVisites, int ordre)           /// un graphe est connexe si à la fin du parcours en profondeur à partir d'un sommet arbitraire, tous les sommets ont été visités
-        {
-            bool connexite = false;
-            for (int i = 1; i <= ordre; i++)
-            {
-                for (int j = 0; j < SommetsVisites.Count; j++)            /// On parcours la liste des sommets visités
-                {
-                    connexite = false;
-                    if (SommetsVisites[j] == i)                          /// Si pour chaque i allant de 1 à l'ordre du graphe on trouve ce nombre dans la liste des sommets visités, alors connexité passe à true et on sors de la deuxième boucle pour étudier la présence du i suivant.
-                    {
-                        connexite = true;
-                        break;
-                    }
-
-                }
-                if (connexite == false)
-                {
-                    break;                                     /// Si la connexité reste à false, alors au moins 1 sommet n'a pas été visité donc on sort de la première boucle et l'algorithme se termine : le graphe n'est pas connexe.
-                }
-            }
-            if (connexite == true)
-            { Console.WriteLine("Le graphe est connexe car tous les sommets ont été visités."); }
-            else { Console.WriteLine("Le graphe n'est pas connexe car tous les sommets n'ont pas été visités."); }
-
-            return connexite;
-        }
-
-
-
-        public List<int> ParcoursEnLargeurDabord(Noeud<T>[] noeuds, int ordre)
-        {
-            List<int> SommetsVisites2 = new List<int>();                            /// On initialise la liste de Sommetvisités du parcours en largeur
-            int SommetDepart = Convert.ToInt32(Console.ReadLine());
-            while (SommetDepart > matrice_relation.Length || SommetDepart <= 0)
-            {
-                Console.WriteLine("Le sommet n'est pas valide : il faut saisir un sommet existant");          /// Comme précédemment, l'utilisateur saisi le sommet de départ jusqu'à ce qu'il soit valide
-                SommetDepart = Convert.ToInt32(Console.ReadLine());
-            }
-
-            Queue<int> file = new Queue<int>();                /// Cette fois on crée une queue qui va stocker les sommet visités et on y ajoute le sommet de départ.
-            file.Enqueue(SommetDepart);
-
-            noeuds[SommetDepart - 1].couleur = "jaune";                 /// Le sommet de départ devient jaune.
-            int Sommet = SommetDepart;
-
-            while (file.Count != 0)                       /// L'algorithme se terminera quand le queue sera vide.
-            {
-                Sommet = file.Peek();
-                SommetsVisites2.Add(Sommet);
-                file.Dequeue();                                   /// On retire le premier sommet de la queue puis on met tous ses voisins blanc en jaune et on les ajoute dans la queue.
-                for (int i = 0; i < noeuds[Sommet - 1].listevoisins.Count; i++)
-                {
-                    if (noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur == "blanc")
-                    {
-                        noeuds[noeuds[Sommet - 1].listevoisins[i] - 1].couleur = "jaune";
-                        file.Enqueue(noeuds[Sommet - 1].listevoisins[i]);
-                    }
-                }
-
-                noeuds[Sommet - 1].couleur = "rouge";         /// Le noeud dont tous les voisins sont passés jaune a été traité complètement : il passe en rouge.
-
-            }
-
-            for (int i = 0; i < SommetsVisites2.Count; i++)
-            {
-                Console.Write(SommetsVisites2[i] + " ; ");                /// On affiche la liste des Sommets Visités par le parcours en largeur
-            }
-
-            for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
-            {
-                noeuds[i].couleur = "blanc";
-            }
-
-            return SommetsVisites2;
-        }
-    }
-}
-
-
+    
 
          public List<int> AlgorithmeDijkstra(Noeud<T>[] noeuds, int[,] matriceAdjacence, int ordre)
 {
@@ -596,7 +405,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
                 {
                    
                     distance[voisin] = Convert.ToInt32(distance[sommet-1]) + matriceAdjacence[sommet - 1, voisin];        /// ... on met à jour la distance du voisin    
-                    predecesseur[voisin] = sommet-1;                                                     /// Le prédécesseur du voisin est le sommet actuel
+                    predecesseur[voisin] = sommet-1;                                                     /// Le prédécesseur du voisin devient le sommet actuel
                     
                 }
             }
@@ -622,6 +431,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         tempsTotal += matriceAdjacence[stationInitiale, stationSuivante];    /// A chaque itération, on chercher le temps entre les deux stations dans la matrice d'adjacence.
     }
 
+     ///On affiche le chemin le plus court
     Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ-1].nom + " (n°" + noeuds[départ-1].idNoeud + ") et la station de métro " + noeuds[arrivée-1].nom + " (n°" + noeuds[arrivée-1].idNoeud + ") est le trajet : ");
     for (int i = 0; i < CheminLePlusCourt.Count; i++)
     {
@@ -650,7 +460,6 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
     return CheminLePlusCourt;
 }
-
 
 
 
@@ -693,41 +502,43 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
             int infini = 999999999;
             
 
-            int[] distance = new int[ordre];
+            int[] distance = new int[ordre];               /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
             int[] predecesseur = new int[ordre];
 
-            for (int i = 0; i < ordre; i++)                                      /// Cette étape correspond au remplissage de la première ligne du tableau du l'algorithme de Dijkstra : on rempli les cases de distances des sommets adjacents avec le poids, les autres somemts restent à une distance +oo
+            for (int i = 0; i < ordre; i++)                                      
             {
-                distance[i] = infini;
-                predecesseur[i] = -1;
+                distance[i] = infini;                 /// On initalise toutes les distances à plus l'infini 
+                predecesseur[i] = -1;                 /// On initialise touts les prédecesseurs à -1 (nous avons choisi -1 pour représenté null) 
             }
-            distance[départ - 1] = 0;
+            distance[départ - 1] = 0;            /// La distance du sommet de départ est mise à 0
+
 
             
 
-            for (int i = 0; i < ordre - 1; i++)  /// Le nombre d'itération sera limité au nombre d'ar^tes du graphe
+            for (int i = 0; i < ordre - 1; i++)  /// Le nombre d'itération sera limité au nombre d'arêtes du graphe
             {
                 for (int j = 1; j <= ordre; j++)
                 {
-                    for (int h = 0; h < noeuds[j-1].listevoisins.Count; h++)
+                    for (int h = 0; h < noeuds[j-1].listevoisins.Count; h++)        /// On parcours chaque sommet et chaque élément de sa liste de voisins ce qui reviens à parcourir chaque arête du graphe
                     {
                         int voisin = noeuds[j-1].listevoisins[h] - 1;
                         if (Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j-1, voisin] < distance[voisin])
                         {
-                            distance[voisin] = Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin];
-                            predecesseur[voisin] = j - 1;
+                            distance[voisin] = Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin];          /// Si la condition du if est respectée alors on met à jour la distance du voisin
+                            predecesseur[voisin] = j - 1;                  /// Le prédecesseur du voisin deviens la source du lien
                         }
                     }
                 }
             }
 
-            /// Pour que l'algorithme de Bellmann-Ford puisse s'appliquer, il faut s'assurer qu'il n'y pas de cycle absorbant
-            /// vérification de l'inexistance de cycle de poids strictement négatifs en fin d'algorithme:
-            /// Il s'agit en fait de refaire une dernière itération et de voir si les distances changent
+           /// Pour que l'algorithme de Bellmann-Ford puisse s'appliquer, il faut s'assurer qu'il n'y pas de cycle absorbant
+           /// Il s'agit en fait de refaire une dernière itération et de voir si les distances changent
+           /// vérification de l'inexistance de cycle de poids strictement négatifs en fin d'algorithme:
+           
             
             for (int j = 1; j <= ordre; j++)
             {
-                for (int h = 0; h < noeuds[j - 1].listevoisins.Count; h++)
+                for (int h = 0; h < noeuds[j - 1].listevoisins.Count; h++)       /// On vérifie donc chaque arêtes de la même manière
                 {
                     int voisin = noeuds[j - 1].listevoisins[h] - 1;
                     if (Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin] < distance[voisin])
@@ -741,17 +552,17 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
             /// Nous allons maintenant afficher le chemin le plus court en reconstruisant la liste des predecesseurs.
 
             int SommetArr = arrivée - 1;
-            while (SommetArr != -1)
+            while (SommetArr != -1)                  /// On remonte le chemin parcouru à l'envers pour le reconstruire
             {
-                CheminLePlusCourt.Insert(0, SommetArr + 1);
-                SommetArr = predecesseur[SommetArr];
+                CheminLePlusCourt.Insert(0, SommetArr + 1);          /// On ajoute donc le sommet au début du chemin
+                SommetArr = predecesseur[SommetArr];               /// puis le prédecesseur du sommet deviens le nouveau sommet et ainsi de suite, jusqu'à remonter jusqu'au sommet de départ
             }
 
           
 
             /// On calcule le temps du trajet
             int tempsTotal = 0;
-            for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)
+            for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)          /// Le temps totale est initalisé à 0 puis pour chaque lien entre une StationInitale et une stationSuivante, on ajoute le poids de ce lien au temps total à l'aide de la matrice d'adjacence
             {
                 int stationInitiale = CheminLePlusCourt[i] - 1;
                 int stationSuivante = CheminLePlusCourt[i + 1] - 1;
@@ -775,7 +586,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
             }
             Console.WriteLine();
-            Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");
+            Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");  /// On affiche le temps total du trajet
 
 
 
