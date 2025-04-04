@@ -555,48 +555,48 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
     int infini = 999999999;
     int sommet = départ;
 
-    int[] distance = new int[ordre];
+    int[] distance = new int[ordre];            /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
     int[] predecesseur = new int[ordre];
    
 
-    for (int i=0; i<ordre; i++)                                      /// Cette étape correspond au remplissage de la première ligne du tableau du l'algorithme de Dijkstra : on rempli les cases de distances des sommets adjacents avec le poids, les autres somemts restent à une distance +oo
+    for (int i=0; i<ordre; i++)                                   
     {
-            distance[i] = infini;
-            predecesseur[i] = -1;
+            distance[i] = infini;                       /// On initalise toutes les distances à plus l'infini 
+            predecesseur[i] = -1;                       /// On initialise touts les prédecesseurs à -1 (nous avons choisi -1 pour représenté null) 
         
     }
-    distance[départ - 1] = 0;
+    distance[départ - 1] = 0;                            /// La distance du sommet de départ est mise à 0
 
   
 
-    while (noeuds[arrivée-1].couleur == "blanc")
+    while (noeuds[arrivée-1].couleur == "blanc")                 /// On éxécute l'algorithme jusqu'à ce que le sommet d'arrivée soit visité
     {
        
-        int PlusCourteDistance = infini;
+        int PlusCourteDistance = infini;   
         for (int i = 0; i < ordre; i++)
         {
             if (noeuds[i].couleur == "blanc" && distance[i] < PlusCourteDistance)
             {
                 
-                PlusCourteDistance = distance[i];                    /// On cherche le sommet pour lequel la distance au sommet de départ est la plus courte
+                PlusCourteDistance = distance[i];                    /// On cherche le sommet non visité pour lequel la distance au sommet de départ est la plus courte
                 sommet = i + 1;      
             }
         }
         
-        noeuds[sommet - 1].couleur = "rouge";
+        noeuds[sommet - 1].couleur = "rouge";               /// Ce sommet est ensuite marqué comme visité
        
 
-        for (int i = 0; i < noeuds[sommet-1].listevoisins.Count; i++)
+        for (int i = 0; i < noeuds[sommet-1].listevoisins.Count; i++)                      /// On éxécute ce qui suit pour chaque voisin du sommet actuel
         {
             int voisin = noeuds[sommet - 1].listevoisins[i] - 1;
-            if (noeuds[voisin].couleur == "blanc" && matriceAdjacence[sommet-1, voisin]!= infini)
+            if (noeuds[voisin].couleur == "blanc" && matriceAdjacence[sommet-1, voisin]!= infini)       
             {
                
-                if (Convert.ToInt32(distance[sommet - 1]) + matriceAdjacence[sommet - 1, voisin] < distance[voisin])
+                if (Convert.ToInt32(distance[sommet - 1]) + matriceAdjacence[sommet - 1, voisin] < distance[voisin])     /// Si le sommet est non visité, qu'il existe un lien entre le sommet et le voisin et qu'il respecte la condition du if alors : ...
                 {
                    
-                    distance[voisin] = Convert.ToInt32(distance[sommet-1]) + matriceAdjacence[sommet - 1, voisin];
-                    predecesseur[voisin] = sommet-1;
+                    distance[voisin] = Convert.ToInt32(distance[sommet-1]) + matriceAdjacence[sommet - 1, voisin];        /// ... on met à jour la distance du voisin    
+                    predecesseur[voisin] = sommet-1;                                                     /// Le prédécesseur du voisin est le sommet actuel
                     
                 }
             }
@@ -607,22 +607,15 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
     /// Nous allons maintenant afficher le chemin le plus court en reconstruisant la liste des predecesseurs.
 
     int SommetArr = arrivée - 1;
-    while (SommetArr != -1)
+    while (SommetArr != -1)                        /// On remonte le chemin parcouru à l'envers pour le reconstruire 
     {
-        CheminLePlusCourt.Insert(0, SommetArr + 1);
-        SommetArr = predecesseur[SommetArr];
+        CheminLePlusCourt.Insert(0, SommetArr + 1);              /// On ajoute donc le sommet au début du chemin
+        SommetArr = predecesseur[SommetArr];                     /// puis le prédecesseur du sommet deviens le nouveau sommet et ainsi de suite, jusqu'à remonter jusqu'au sommet de départ
     }
-
-    /// On vérifie si il existe bien un chemin
-    if (CheminLePlusCourt[0] != départ)       
-    {
-        Console.WriteLine("Aucun chemin trouvé entre " + noeuds[départ - 1].nom + " et " + noeuds[arrivée - 1].nom);
-    }
-
 
     /// On calcule le temps du trajet
-    int tempsTotal = 0;
-    for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)
+    int tempsTotal = 0;                  
+    for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)         /// Le temps totale est initalisé à 0 puis pour chaque lien entre une StationInitale et une stationSuivante, on ajoute le poids de ce lien au temps total à l'aide de la matrice d'adjacence
     {
         int stationInitiale = CheminLePlusCourt[i] - 1;
         int stationSuivante = CheminLePlusCourt[i + 1] - 1;
@@ -638,12 +631,12 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         }
         else
         {
-            Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en transformant la associant chaque élément de la liste de chiffre obtenue à son nom de station.
+            Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en associant chaque chiffre de la liste obtenue à son nom de station.
         }
 
     }
     Console.WriteLine();
-    Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");
+    Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");         /// On affiche le temps total du trajet
 
 
 
