@@ -9,6 +9,7 @@ namespace ProjetPSI
     using OfficeOpenXml;
     using System.Runtime.CompilerServices;
     using Projet_PSI;
+    using SkiaSharp;
 
     public class Program
     {
@@ -16,7 +17,7 @@ namespace ProjetPSI
         {
             string fichier = "..\\net7.0\\MetroParis.xlsx";                /// On accède au fichier excel MetroParis contenant tous les liens du graphe
             int[,] matrice_relation = null;
-            string[,] matrice_nomStation = null;
+            string[,] matrice_infoStation = null;
 
             if (!File.Exists(fichier))
             {
@@ -33,7 +34,7 @@ namespace ProjetPSI
                     ExcelWorksheet worksheet2 = package.Workbook.Worksheets[0];
 
                     matrice_relation = new int[worksheet1.Dimension.End.Row - 2, 4];
-                    matrice_nomStation = new string[worksheet2.Dimension.End.Row - 1, 2];
+                    matrice_infoStation = new string[worksheet2.Dimension.End.Row - 1, 4];
 
                     for (int ligne = 2; ligne < worksheet1.Dimension.End.Row; ligne++)
                     {
@@ -55,14 +56,18 @@ namespace ProjetPSI
                     {
                         string idStation2 = Convert.ToString(worksheet2.Cells[ligne, 1].Value);
                         string nomStation = Convert.ToString(worksheet2.Cells[ligne, 3].Value);
-                        matrice_nomStation[ligne - 2, 0] = idStation2;
-                        matrice_nomStation[ligne - 2,1] = nomStation;
+                        string longitudeStation = Convert.ToString(worksheet2.Cells[ligne, 4].Value);
+                        string latitudeStation = Convert.ToString(worksheet2.Cells[ligne, 5].Value);
+                        matrice_infoStation[ligne - 2, 0] = idStation2;
+                        matrice_infoStation[ligne - 2, 1] = nomStation;
+                        matrice_infoStation[ligne - 2, 2] = longitudeStation;
+                        matrice_infoStation[ligne - 2, 3] = latitudeStation;
                     }
                 }
             }
 
 
-            Graphe<int> GrapheMetro = new Graphe<int>(matrice_relation, matrice_nomStation);
+            Graphe<int> GrapheMetro = new Graphe<int>(matrice_relation, matrice_infoStation);
 
             int ordre = GrapheMetro.OrdreDuGraphe(matrice_relation);
             int taille = GrapheMetro.TailleDuGraphe(matrice_relation);
@@ -70,52 +75,33 @@ namespace ProjetPSI
             bool Oriente = GrapheMetro.GrapheOriente(ListeAdjacence);
             int[,] MatriceAdjacence = GrapheMetro.GenererMatriceAdjacence(matrice_relation, ordre);
 
-            GrapheMetro.SommaireMetro(matrice_nomStation);
-
-            /// Visuel VisuelGraphe = new Visuel(GrapheMetro.GenererListeAdjacence(matrice_relation, ordre));
-
-            ///VisuelGraphe.DessinerGraphe();
-
+            GrapheMetro.SommaireMetro(matrice_infoStation);
 
             Noeud<int>[] noeuds = new Noeud<int>[ordre];          /// On initialise un tableau noeuds de Noeud.
-            for (int i = 0; i < ordre; i++)
+
+
+            for(int i = 0; i < ordre; i++)
             {
+                double longitude = 0;
+                double latitude = 0;
                 string nom = "";
-                for (int j=0; j<ordre; j++)
-                {
-                    if (Convert.ToInt32(matrice_nomStation[j,0])==i+1)
-                    {
-                        nom = matrice_nomStation[j, 1];
-                    }
-                }
-                noeuds[i] = new Noeud<int>(i + 1, nom, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
+
+                nom = matrice_infoStation[i, 1];
+                longitude = double.Parse(matrice_infoStation[i, 2]);
+                latitude = double.Parse(matrice_infoStation[i, 3]);
+
+                noeuds[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ListeAdjacence[i]);
             }
 
-
-            Lien<int>[,] liens = new Lien<int>[ordre, ordre];                     /// On initialise une matrice de lien qui contient autant de lien qu'il y en a dans la matrice relation et qui relie un sommet de départ a à un sommet d'arrivée b compris dans l'ordre du graphe
-            for (int a = 0; a < ordre; a++)
-            {
-                for (int b = 0; b < ordre; b++)
-                {
-                    if (ListeAdjacence[a].Contains(b + 1))                    /// Pour tout a et b, si le sommet b est un voisin de a, alors le lien existe
-                    {
-                        for (int h = 0; h < matrice_relation.GetLength(0); h++)
-                        {
-                            if (matrice_relation[h, 0] == a + 1 && matrice_relation[h, 1] == b + 1)          /// on parcours la matrice relation à la recherche de la ligne correspondant au lien a-b avec donc le terme de la première colonne égale à a et celui de la deuxième égale à b
-                            {
-                                int aa = h;                                                         /// lorsqu'on trouve cette ligne, on note son indice
-                                liens[a, b] = new Lien<int>(noeuds[matrice_relation[aa, 0] - 1], noeuds[matrice_relation[aa, 1] - 1], matrice_relation[aa, 3]);              /// on peut maintenant associée à un lien un NOEUD de départ, un NOEUD d'arrivé, et le poids correspondant à ce lien.
-                                break;
-                            }
-                        }
-
-                    }
-
-                }
-            }
+            Visuel visuel = new Visuel(noeuds, matrice_relation);
+            visuel.GenererCarte("metro.png");
 
 
-            GrapheMetro.AlgorithmeFloydWarshall(MatriceAdjacence, ordre, noeuds);
+
+
+
+            ///GrapheMetro.AlgorithmeFloydWarshall(MatriceAdjacence, ordre, noeuds);
+            ///GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
         }
     }
 
