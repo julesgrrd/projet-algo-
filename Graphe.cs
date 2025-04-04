@@ -11,7 +11,7 @@ using Xamarin.Forms;
 
 namespace ProjetPSI
 {
-    public class Graphe <T>
+    public class Graphe<T>
     {
         public T[,] matrice_relation { get; set; }
         public string[,] matrice_nomStation { get; set; }
@@ -83,409 +83,429 @@ namespace ProjetPSI
         }
 
 
-
-
         public List<int>[] GenererListeAdjacence(T[,] matrice_relation, int ordre)
-{
-    List<int>[] ListeAdjacence = new List<int>[ordre];       /// On crée un tableau de liste ou le nombre d'éléments du tableau sera l'ordre du graphe et à chaque éléments on associe une liste (liste de voisins)
-
-    for (int i = 0; i < ordre; i++)
-    {
-        ListeAdjacence[i] = new List<int>();                 /// On crée une liste pour chaque élément du tableau
-    }
-
-    int nbLigne = matrice_relation.GetLength(0);
-
-    for (int i = 0; i < nbLigne; i++)
-    {
-        int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);                 
-        int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
-        int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
-
-        if (idStation1==0 || idStation2 ==0 || idStation1>ordre || idStation2 >ordre)
         {
-            continue;
+            List<int>[] ListeAdjacence = new List<int>[ordre];       /// On crée un tableau de liste ou le nombre d'éléments du tableau sera l'ordre du graphe et à chaque éléments on associe une liste (liste de voisins)
+
+            for (int i = 0; i < ordre; i++)
+            {
+                ListeAdjacence[i] = new List<int>();                 /// On crée une liste pour chaque élément du tableau
+            }
+
+            int nbLigne = matrice_relation.GetLength(0);
+
+            for (int i = 0; i < nbLigne; i++)
+            {
+                int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
+                int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
+                int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
+
+                if (idStation1 == 0 || idStation2 == 0 || idStation1 > ordre || idStation2 > ordre)
+                {
+                    continue;
+                }
+
+                ListeAdjacence[idStation1 - 1].Add(idStation2);            /// Pour tous les liens de la matrice relation, on ajoute le voisin du sommet dans la liste d'adjacence du sommet
+
+                if (doubleSens == 1)                                         /// Si "doubleSens==1", la relation est réciproque donc on ajoute également le somet dans la liste d'adjacence du voisin.
+                {
+                    ListeAdjacence[idStation2 - 1].Add(idStation1);
+                }
+            }
+
+            Console.WriteLine("Liste d'adjacence :");               /// On l'affiche
+            for (int i = 0; i < ListeAdjacence.Length; i++)
+            {
+                Console.Write(i + 1 + ": ");
+                for (int j = 0; j < ListeAdjacence[i].Count; j++)
+                {
+
+                    Console.Write(ListeAdjacence[i][j] + ",");
+
+                }
+                Console.WriteLine();
+            }
+
+
+            return ListeAdjacence;
+
         }
-
-        ListeAdjacence[idStation1 - 1].Add(idStation2);            /// Pour tous les liens de la matrice relation, on ajoute le voisin du sommet dans la liste d'adjacence du sommet
-
-        if (doubleSens==1)                                         /// Si "doubleSens==1", la relation est réciproque donc on ajoute également le somet dans la liste d'adjacence du voisin.
-        {
-            ListeAdjacence[idStation2 - 1].Add(idStation1);
-        }
-    }
-
-    Console.WriteLine("Liste d'adjacence :");               /// On l'affiche
-    for (int i = 0; i < ListeAdjacence.Length; i++)
-    {
-        Console.Write(i + 1 + ": ");
-        for (int j = 0; j < ListeAdjacence[i].Count; j++)
-        {
-
-            Console.Write(ListeAdjacence[i][j] + ",");
-
-        }
-        Console.WriteLine();
-    }
-
-
-    return ListeAdjacence;
-
-}
-
-
-
-
-
 
 
         public int[,] GenererMatriceAdjacence(T[,] matrice_relation, int ordre)
-{
-    int[,] MatriceAdjacence = new int[ordre, ordre];                /// On crée une matrice d'adjacence de même largeur et hauteur correspondant à l'ordre du graphe
-    int infini = 9999999;
-
-    for (int i=0; i<ordre; i++)
-    {
-        for (int j=0; j<ordre; j++)
         {
-            if (i == j)
+            int[,] MatriceAdjacence = new int[ordre, ordre];                /// On crée une matrice d'adjacence de même largeur et hauteur correspondant à l'ordre du graphe
+            int infini = 9999999;
+
+            for (int i = 0; i < ordre; i++)
             {
-                MatriceAdjacence[i, j] = 0;                    /// Tous les éléments sur la diagonale de la matrice sont mis à zéro
-            } else
+                for (int j = 0; j < ordre; j++)
+                {
+                    if (i == j)
+                    {
+                        MatriceAdjacence[i, j] = 0;                    /// Tous les éléments sur la diagonale de la matrice sont mis à zéro
+                    }
+                    else
+                    {
+                        MatriceAdjacence[i, j] = infini;               /// Les autres sont mis à infini en attendant d'être modifié par la suite si il existe un lien
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < matrice_relation.GetLength(0); i++)
             {
-                MatriceAdjacence[i, j] = infini;               /// Les autres sont mis à infini en attendant d'être modifié par la suite si il existe un lien
+                int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
+                int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
+                int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
+                int poids = Convert.ToInt32(matrice_relation[i, 3]);
+
+                if (idStation1 == 0 || idStation2 == 0 || idStation1 > ordre || idStation2 > ordre)
+                {
+                    continue;
+                }
+
+                if (doubleSens == 1)
+                {
+                    MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     /// on rempli la matrice grâce à la matrice relation : matriceAdjacence[i,j] correspond au poids du lien entre i et j lorsque les sommets i et j sont voisins.
+                    MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1, Convert.ToInt32(matrice_relation[i, 0]) - 1] = poids;     /// Les relations sont réciproques donc on fait l'opération dans les deux sens
+                }
+                else
+                {
+                    MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     ///Ici la relation n'est pas réciproque donc on complète dans un sens seulement
+                }
+
+            }
+
+            return MatriceAdjacence;
+        }
+
+
+
+        /// <summary>
+        /// Fonction qui permet d'afficher le Sommaire de l'ensemble des stations du métro
+        /// </summary>
+        /// <param name="matrice_nomStation"></param>
+        public void SommaireMetro(string[,] matrice_nomStation)
+        {
+
+            Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");    /// Affichage pour la présentation
+
+                                                                                                                                                                /// Boucle qui permet d'afficher l'identifiant de chaque station, suivi de leur nom
+            for (int i = 0; i < matrice_nomStation.GetLength(0); i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    /// Permet d'aligner les noms des stations, en fonction de la taille de l'identifiant
+                    if (Convert.ToInt32(matrice_nomStation[i, 0]) < 10)
+                    {
+                        Console.Write(matrice_nomStation[i, j] + "   ");
+                    }
+                    else if (Convert.ToInt32(matrice_nomStation[i, 0]) < 100)
+                    {
+                        Console.Write(matrice_nomStation[i, j] + "  ");
+                    }
+                    else
+                    {
+                        Console.Write(matrice_nomStation[i, j] + " ");
+                    }
+
+
+                }
+                Console.WriteLine();
             }
         }
-    }
 
 
-    for (int i = 0; i < matrice_relation.GetLength(0); i++)
-    {
-        int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
-        int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
-        int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
-        int poids = Convert.ToInt32(matrice_relation[i, 3]);
-
-        if (idStation1 == 0 || idStation2 == 0 || idStation1 > ordre || idStation2 > ordre)
+        /// <summary>
+        /// Algorithme de FloyWarshall permettant de trouver le plus court chemin entre deux stations
+        /// </summary>
+        /// <param name="matriceAdjacence"></param>
+        /// <param name="ordre"></param>
+        /// <param name="noeuds"></param>
+        /// <returns></returns>
+        public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noeud<T>[] noeuds)
         {
-            continue;
-        }
+            List<int> PCC = new List<int>(); /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
+            int infini = 9999999;    /// On donne une très grande valeur qui représente l'infini
 
-        if (doubleSens==1)     
-        {
-            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     /// on rempli la matrice grâce à la matrice relation : matriceAdjacence[i,j] correspond au poids du lien entre i et j lorsque les sommets i et j sont voisins.
-            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1, Convert.ToInt32(matrice_relation[i, 0]) - 1] = poids;     /// Les relations sont réciproques donc on fait l'opération dans les deux sens
-        } else
-        {
-            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     ///Ici la relation n'est pas réciproque donc on complète dans un sens seulement
-        }
-       
-    }
+            Console.WriteLine("\nNous allons utiliser l'algorithme de Floyd-Warshall pour déterminer le chemin le plus court entre deux sommets.");
 
-    return MatriceAdjacence;
-}
-
-
-/// Fonction qui permet d'afficher le Sommaire de l'ensemble des stations du métro
-public void SommaireMetro(string[,] matrice_nomStation)
-{
-
-    Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");    /// Affichage pour la présentation
-    
-    /// Boucle qui permet d'afficher l'identifiant de chaque station, suivi de leur nom
-    for (int i = 0; i < matrice_nomStation.GetLength(0); i++)
-    {
-        for (int j = 0; j < matrice_nomStation.GetLength(1); j++)
-        {
-            /// Permet d'aligner les noms des stations, en fonction de la taille de l'identifiant
-            if (Convert.ToInt32(matrice_nomStation[i, 0]) < 10)
+            /// On demande à l'utilisateur s'il souhaite afficher de nouveau le sommaire, afin de trouver l'identifiant des stations
+            string reponse = "";
+            Console.WriteLine("\nSouhaitez-vous afficher le sommaire des stations de métro ? ");
+            do
             {
-                Console.Write(matrice_nomStation[i, j] + "   ");
+                Console.WriteLine("Entrez OUI ou NON : ");
+                reponse = Console.ReadLine().ToLower(); /// Permet de fonctionner si l'utilisateur écrit en minus
+            } while (reponse != "oui" && reponse != "non");
+
+            if (reponse == "oui")
+            {
+                SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
             }
-            else if (Convert.ToInt32(matrice_nomStation[i, 0]) < 100)
+
+            /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de départ
+            int depart;
+            Console.WriteLine("\nSaisir le numéro de la station de départ en vous référant au sommaire : ");
+            depart = Convert.ToInt32(Console.ReadLine());
+            while (depart <= 0 || depart > ordre)
             {
-                Console.Write(matrice_nomStation[i, j] + "  ");
+                /// Affiche un message d'erreur si l'identifiant de la station n'existe pas
+                Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station de départ en vous référant au sommaire : ");
+                depart = Convert.ToInt32(Console.ReadLine());
+            }
+
+            /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de d'arrivée
+            int arrivee;
+            Console.WriteLine("\nSaisir le numéro de la station d'arrivée en vous référant au sommaire : ");
+            arrivee = Convert.ToInt32(Console.ReadLine());
+            while (arrivee <= 0 || arrivee > ordre)
+            {
+                /// Affiche un message d'erreur si l'identifiant de la station n'existe pas
+                Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station d'arrivee en vous référant au sommaire : ");
+                arrivee = Convert.ToInt32(Console.ReadLine());
+            }
+
+            /// On initialise les matrices des distances et des prédécesseurs
+            int[,] distance = new int[ordre, ordre];
+            int[,] predecesseur = new int[ordre, ordre];
+
+
+            for (int i = 0; i < ordre; i++)
+            {
+                for (int j = 0; j < ordre; j++)
+                {
+                    distance[i, j] = matriceAdjacence[i, j];
+
+                    if (matriceAdjacence[i, j] == infini || i == j)
+                    {
+                        predecesseur[i, j] = -1;    /// On donne la valeur -1 si aucun prédecesseur n'est trouvé
+                    }
+                    else
+                    {
+                        predecesseur[i, j] = i;    /// Le prédécesseur intial correspond au sommet de départ
+                    }
+                }
+            }
+
+            /// Algorithme qui correspond au pseudo-code de Floyd-Warshall
+            for (int k = 0; k < ordre; k++)    /// k correspond au sommet intermédiaire
+            {
+                for (int i = 0; i < ordre; i++)    /// i correspond au sommet source
+                {
+                    for (int j = 0; j < ordre; j++)    /// j correspond au sommet destination
+                    {
+                        /// Si le chemin qui passe par k est plus court, on met à jour la distance et le prédécesseur
+                        if (distance[i, k] != infini && distance[k, j] != infini && distance[i, k] + distance[k, j] < distance[i, j])
+                        {
+                            distance[i, j] = distance[i, k] + distance[k, j];
+                            predecesseur[i, j] = predecesseur[k, j];
+                        }
+                    }
+                }
+            }
+
+            /// On va reconstruire le PCC à partir de la matrice des prédécesseurs
+            int stationActuelle = arrivee - 1;
+            if (predecesseur[depart - 1, arrivee - 1] == -1)
+            {
+                Console.WriteLine("Aucun chemin n'existe pour relier ces deux stations");
             }
             else
             {
-                Console.Write(matrice_nomStation[i, j] + " ");
-            }
-
-
-        }
-        Console.WriteLine();
-    }
-}
-
-/// Algorithme de FloyWarshall permettant de trouver le plus court chemin entre deux stations
-public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noeud<T>[] noeuds)
-{
-    List<int> PCC = new List<int>(); /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
-    int infini = 9999999;    /// On donne une très grande valeur qui représente l'infini
-
-    Console.WriteLine("\nNous allons utiliser l'algorithme de Floyd-Warshall pour déterminer le chemin le plus court entre deux sommets.");
-
-    /// On demande à l'utilisateur s'il souhaite afficher de nouveau le sommaire, afin de trouver l'identifiant des stations
-    string reponse = "";
-    Console.WriteLine("\nSouhaitez-vous afficher le sommaire des stations de métro ? ");
-    do
-    {
-        Console.WriteLine("Entrez OUI ou NON : ");
-        reponse = Console.ReadLine().ToLower(); /// Permet de fonctionner si l'utilisateur écrit en minus
-    } while (reponse != "oui" && reponse != "non");
-
-    if (reponse == "oui")
-    {
-        SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
-    }
-
-    /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de départ
-    int depart;
-    Console.WriteLine("\nSaisir le numéro de la station de départ en vous référant au sommaire : ");
-    depart = Convert.ToInt32(Console.ReadLine());
-    while (depart <= 0 || depart > ordre)
-    {
-        /// Affiche un message d'erreur si l'identifiant de la station n'existe pas
-        Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station de départ en vous référant au sommaire : ");
-        depart = Convert.ToInt32(Console.ReadLine());
-    }
-
-    /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de d'arrivée
-    int arrivee;
-    Console.WriteLine("\nSaisir le numéro de la station d'arrivée en vous référant au sommaire : ");
-    arrivee = Convert.ToInt32(Console.ReadLine());
-    while (arrivee <= 0 || arrivee > ordre)
-    {
-        /// Affiche un message d'erreur si l'identifiant de la station n'existe pas
-        Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station d'arrivee en vous référant au sommaire : ");
-        arrivee = Convert.ToInt32(Console.ReadLine());
-    }
-
-    /// On initialise les matrices des distances et des prédécesseurs
-    int[,] distance = new int[ordre, ordre];
-    int[,] predecesseur = new int[ordre, ordre];
-
-    
-    for (int i=0; i<ordre; i++)
-    {
-        for (int j=0; j<ordre; j++)
-        {
-            distance[i, j] = matriceAdjacence[i, j];
-
-            if (matriceAdjacence[i,j] == infini || i==j)
-            {
-                predecesseur[i, j] = -1;    /// On donne la valeur -1 si aucun prédecesseur n'est trouvé
-            } else
-            {
-                predecesseur[i, j] = i;    /// Le prédécesseur intial correspond au sommet de départ
-            }
-        }
-    }
-
-    // Algorithme qui correspond au pseudo-code de Floyd-Warshall
-    for (int k=0; k<ordre; k++)    /// k correspond au sommet intermédiaire
-    {
-        for (int i=0; i<ordre; i++)    /// i correspond au sommet source
-        {
-            for (int j=0; j<ordre; j++)    /// j correspond au sommet destination
-            {
-                /// Si le chemin qui passe par k est plus court, on met à jour la distance et le prédécesseur
-                if (distance[i,k] != infini && distance[k,j] != infini && distance[i,k] + distance[k,j] < distance[i,j])
+                /// On remonte le chemin jusqu'à la station de départ(
+                while (stationActuelle != -1)
                 {
-                    distance[i, j] = distance[i, k] + distance[k, j];
-                    predecesseur[i, j] = predecesseur[k, j];
+                    /// On ajoute le sommet de départ en tête de liste
+                    PCC.Insert(0, stationActuelle + 1);    /// On ajoute 
+                    stationActuelle = predecesseur[depart - 1, stationActuelle];
+                }
+
+                /// Calcul du poids total du PCC
+                int poidsTotal = 0;
+                for (int i = 0; i < PCC.Count - 1; i++)
+                {
+                    int station1 = PCC[i] - 1;
+                    int station2 = PCC[i + 1] - 1;
+                    poidsTotal += matriceAdjacence[station1, station2];
+                }
+                /// On affiche le chemin du chemin le plus court, avec le temps total
+                Console.WriteLine("\nLe chemin le plus court entre la station de métro numéro " + depart + " : " + noeuds[depart - 1].nom + " et la station numéro " + arrivee + " : " + noeuds[arrivee - 1].nom + " est : ");
+                for (int i = 0; i < PCC.Count; i++)
+                {
+                    Console.Write(noeuds[PCC[i] - 1].nom);
+                    if (i < PCC.Count - 1)
+                    {
+                        Console.Write(" --> ");
+                    }
+                }
+                Console.WriteLine();
+                Console.WriteLine("Ce trajet durera : " + poidsTotal + " minutes.");
+            }
+
+            return PCC;
+        }
+
+        /// <summary>
+        /// Algorithme de Dijkstra permettant de trouver le plus court chemin entre deux stations
+        /// </summary>
+        /// <param name="noeuds"></param>
+        /// <param name="matriceAdjacence"></param>
+        /// <param name="ordre"></param>
+        /// <returns></returns>
+        public List<int> AlgorithmeDijkstra(Noeud<T>[] noeuds, int[,] matriceAdjacence, int ordre)
+        {
+            List<int> CheminLePlusCourt = new List<int>();                           /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
+            Console.WriteLine("Nous allons utiliser l'algorithme de Dijkstra pour déterminer le chemin le plus court entre deux sommet.");
+
+
+            /// On demande à l'utilisateur s'il souhaite afficher de nouveau le sommaire, afin de trouver l'identifiant des stations
+            string reponse;
+            Console.WriteLine("\nSouhaitez-vous afficher le sommaire des stations de métro ? ");
+            do
+            {
+                Console.WriteLine("Entrez OUI ou NON : ");
+                reponse = Console.ReadLine().ToLower(); /// Permet de fonctionner si l'utilisateur écrit en minus
+            } while (reponse != "oui" && reponse != "non");
+
+            if (reponse == "oui")
+            {
+                SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
+            }
+
+            /// On demande à l'utilisateur une station de départ et une station d'arrivée.
+            Console.WriteLine("Saisir le numéro de la station de départ en vous référant au sommaire :");
+            int départ = Convert.ToInt32(Console.ReadLine());
+            while (départ > ordre || départ <= 0)
+            {
+                Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station de départ jusqu'à ce qu'elle soit valide
+                départ = Convert.ToInt32(Console.ReadLine());
+            }
+
+            Console.WriteLine("Saisir le numéro de la station d'arrivée en vous référant au sommaire :");
+            int arrivée = Convert.ToInt32(Console.ReadLine());
+            while (arrivée > ordre || arrivée <= 0)
+            {
+                Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station d'arrivée jusqu'à ce qu'elle soit valide
+                arrivée = Convert.ToInt32(Console.ReadLine());
+            }
+            int infini = 999999999;    /// On donne une très grande valeur qui représente l'infini
+            int sommet = départ;
+
+            int[] distance = new int[ordre];            /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
+            int[] predecesseur = new int[ordre];
+
+
+            for (int i = 0; i < ordre; i++)
+            {
+                distance[i] = infini;                       /// On initalise toutes les distances à plus l'infini 
+                predecesseur[i] = -1;                       /// On initialise touts les prédecesseurs à -1 (nous avons choisi -1 pour représenté null) 
+
+            }
+            distance[départ - 1] = 0;                            /// La distance du sommet de départ est mise à 0
+
+
+
+            while (noeuds[arrivée - 1].couleur == "blanc")                 /// On éxécute l'algorithme jusqu'à ce que le sommet d'arrivée soit visité
+            {
+
+                int PlusCourteDistance = infini;
+                for (int i = 0; i < ordre; i++)
+                {
+                    if (noeuds[i].couleur == "blanc" && distance[i] < PlusCourteDistance)
+                    {
+
+                        PlusCourteDistance = distance[i];                    /// On cherche le sommet non visité pour lequel la distance au sommet de départ est la plus courte
+                        sommet = i + 1;
+                    }
+                }
+
+                noeuds[sommet - 1].couleur = "rouge";               /// Ce sommet est ensuite marqué comme visité
+
+
+                for (int i = 0; i < noeuds[sommet - 1].listevoisins.Count; i++)                      /// On éxécute ce qui suit pour chaque voisin du sommet actuel
+                {
+                    int voisin = noeuds[sommet - 1].listevoisins[i] - 1;
+                    if (noeuds[voisin].couleur == "blanc" && matriceAdjacence[sommet - 1, voisin] != infini)
+                    {
+
+                        if (Convert.ToInt32(distance[sommet - 1]) + matriceAdjacence[sommet - 1, voisin] < distance[voisin])     /// Si le sommet est non visité, qu'il existe un lien entre le sommet et le voisin et qu'il respecte la condition du if alors : ...
+                        {
+
+                            distance[voisin] = Convert.ToInt32(distance[sommet - 1]) + matriceAdjacence[sommet - 1, voisin];        /// ... on met à jour la distance du voisin    
+                            predecesseur[voisin] = sommet - 1;                                                     /// Le prédécesseur du voisin devient le sommet actuel
+
+                        }
+                    }
                 }
             }
-        }
-    }
 
-    /// On va reconstruire le PCC à partir de la matrice des prédécesseurs
-    int stationActuelle = arrivee - 1;
-    if (predecesseur[depart-1, arrivee-1] == -1)
-    {
-        Console.WriteLine("Aucun chemin n'existe pour relier ces deux stations");
-    } else
-    {
-        /// On remonte le chemin jusqu'à la station de départ(
-        while (stationActuelle !=-1)
-        {
-            /// On ajoute le sommet de départ en tête de liste
-            PCC.Insert(0, stationActuelle + 1);    /// On ajoute 
-            stationActuelle = predecesseur[depart - 1, stationActuelle];
-        }
 
-        /// Calcul du poids total du PCC
-        int poidsTotal = 0;
-        for (int i=0; i<PCC.Count-1; i++)
-        {
-            int station1 = PCC[i] - 1;
-            int station2 = PCC[i + 1] - 1;
-        }
-        /// On affiche le chemin du chemin le plus court, avec le temps total
-        Console.WriteLine("\nLe chemin le plus court entre la station de métro numéro " + depart + " : " + noeuds[depart - 1].nom + " et la station numéro " + arrivee + " : " + noeuds[arrivee - 1].nom + " est : ");
-        for (int i=0; i<PCC.Count; i++)
-        {
-            Console.Write(noeuds[PCC[i] - 1].nom);
-            if (i<PCC.Count -1)
+            /// Nous allons maintenant afficher le chemin le plus court en reconstruisant la liste des predecesseurs.
+
+            int SommetArr = arrivée - 1;
+            while (SommetArr != -1)                        /// On remonte le chemin parcouru à l'envers pour le reconstruire 
             {
-                Console.Write(" --> ");
+                CheminLePlusCourt.Insert(0, SommetArr + 1);              /// On ajoute donc le sommet au début du chemin
+                SommetArr = predecesseur[SommetArr];                     /// puis le prédecesseur du sommet deviens le nouveau sommet et ainsi de suite, jusqu'à remonter jusqu'au sommet de départ
             }
-        }
-        Console.WriteLine();
-    }
 
-    return PCC;  
-}
-    
-
-         public List<int> AlgorithmeDijkstra(Noeud<T>[] noeuds, int[,] matriceAdjacence, int ordre)
-{
-    List<int> CheminLePlusCourt = new List<int>();                           /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
-    Console.WriteLine("Nous allons utiliser l'algorithme de Dijkstra pour déterminer le chemin le plus court entre deux sommet.");
-
-
-    /// On demande à l'utilisateur s'il souhaite afficher de nouveau le sommaire, afin de trouver l'identifiant des stations
-    string reponse;
-    Console.WriteLine("\nSouhaitez-vous afficher le sommaire des stations de métro ? ");
-    do
-    {
-        Console.WriteLine("Entrez OUI ou NON : ");
-        reponse = Console.ReadLine().ToLower(); /// Permet de fonctionner si l'utilisateur écrit en minus
-    } while (reponse != "oui" && reponse != "non");
-
-    if (reponse == "oui")
-    {
-        SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
-    }
-
-    /// On demande à l'utilisateur une station de départ et une station d'arrivée.
-    Console.WriteLine("Saisir le numéro de la station de départ en vous référant au sommaire :");
-    int départ = Convert.ToInt32(Console.ReadLine());                        
-    while (départ > ordre || départ <= 0)
-    {
-        Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station de départ jusqu'à ce qu'elle soit valide
-        départ = Convert.ToInt32(Console.ReadLine());
-    }
-
-    Console.WriteLine("Saisir le numéro de la station d'arrivée en vous référant au sommaire :");
-    int arrivée = Convert.ToInt32(Console.ReadLine());
-    while (arrivée > ordre || arrivée <= 0)
-    {
-        Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station d'arrivée jusqu'à ce qu'elle soit valide
-        arrivée = Convert.ToInt32(Console.ReadLine());
-    }
-    int infini = 999999999;    /// On donne une très grande valeur qui représente l'infini
-    int sommet = départ;
-
-    int[] distance = new int[ordre];            /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
-    int[] predecesseur = new int[ordre];
-   
-
-    for (int i=0; i<ordre; i++)                                   
-    {
-            distance[i] = infini;                       /// On initalise toutes les distances à plus l'infini 
-            predecesseur[i] = -1;                       /// On initialise touts les prédecesseurs à -1 (nous avons choisi -1 pour représenté null) 
-        
-    }
-    distance[départ - 1] = 0;                            /// La distance du sommet de départ est mise à 0
-
-  
-
-    while (noeuds[arrivée-1].couleur == "blanc")                 /// On éxécute l'algorithme jusqu'à ce que le sommet d'arrivée soit visité
-    {
-       
-        int PlusCourteDistance = infini;   
-        for (int i = 0; i < ordre; i++)
-        {
-            if (noeuds[i].couleur == "blanc" && distance[i] < PlusCourteDistance)
+            /// On calcule le temps du trajet
+            int tempsTotal = 0;
+            for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)         /// Le temps totale est initalisé à 0 puis pour chaque lien entre une StationInitale et une stationSuivante, on ajoute le poids de ce lien au temps total à l'aide de la matrice d'adjacence
             {
-                
-                PlusCourteDistance = distance[i];                    /// On cherche le sommet non visité pour lequel la distance au sommet de départ est la plus courte
-                sommet = i + 1;      
+                int stationInitiale = CheminLePlusCourt[i] - 1;
+                int stationSuivante = CheminLePlusCourt[i + 1] - 1;
+                tempsTotal += matriceAdjacence[stationInitiale, stationSuivante];    /// A chaque itération, on chercher le temps entre les deux stations dans la matrice d'adjacence.
             }
-        }
-        
-        noeuds[sommet - 1].couleur = "rouge";               /// Ce sommet est ensuite marqué comme visité
-       
 
-        for (int i = 0; i < noeuds[sommet-1].listevoisins.Count; i++)                      /// On éxécute ce qui suit pour chaque voisin du sommet actuel
-        {
-            int voisin = noeuds[sommet - 1].listevoisins[i] - 1;
-            if (noeuds[voisin].couleur == "blanc" && matriceAdjacence[sommet-1, voisin]!= infini)       
+            ///On affiche le chemin le plus court
+            if (CheminLePlusCourt[0] != départ)
             {
-               
-                if (Convert.ToInt32(distance[sommet - 1]) + matriceAdjacence[sommet - 1, voisin] < distance[voisin])     /// Si le sommet est non visité, qu'il existe un lien entre le sommet et le voisin et qu'il respecte la condition du if alors : ...
+                Console.WriteLine("Aucun chemin trouvé entre " + noeuds[départ - 1].nom + " et " + noeuds[arrivée - 1].nom);
+            }
+            else
+            {
+                Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ - 1].nom + " (n°" + noeuds[départ - 1].idNoeud + ") et la station de métro " + noeuds[arrivée - 1].nom + " (n°" + noeuds[arrivée - 1].idNoeud + ") est le trajet : ");
+                for (int i = 0; i < CheminLePlusCourt.Count; i++)
                 {
-                   
-                    distance[voisin] = Convert.ToInt32(distance[sommet-1]) + matriceAdjacence[sommet - 1, voisin];        /// ... on met à jour la distance du voisin    
-                    predecesseur[voisin] = sommet-1;                                                     /// Le prédécesseur du voisin devient le sommet actuel
-                    
+                    if (i == CheminLePlusCourt.Count - 1)
+                    {
+                        Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom);
+                    }
+                    else
+                    {
+                        Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en associant chaque chiffre de la liste obtenue à son nom de station.
+                    }
+
                 }
+                Console.WriteLine();
+                Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");         /// On affiche le temps total du trajet
             }
-        }
-    }
 
 
-    /// Nous allons maintenant afficher le chemin le plus court en reconstruisant la liste des predecesseurs.
 
-    int SommetArr = arrivée - 1;
-    while (SommetArr != -1)                        /// On remonte le chemin parcouru à l'envers pour le reconstruire 
-    {
-        CheminLePlusCourt.Insert(0, SommetArr + 1);              /// On ajoute donc le sommet au début du chemin
-        SommetArr = predecesseur[SommetArr];                     /// puis le prédecesseur du sommet deviens le nouveau sommet et ainsi de suite, jusqu'à remonter jusqu'au sommet de départ
-    }
 
-    /// On calcule le temps du trajet
-    int tempsTotal = 0;                  
-    for (int i = 0; i < CheminLePlusCourt.Count - 1; i++)         /// Le temps totale est initalisé à 0 puis pour chaque lien entre une StationInitale et une stationSuivante, on ajoute le poids de ce lien au temps total à l'aide de la matrice d'adjacence
-    {
-        int stationInitiale = CheminLePlusCourt[i] - 1;
-        int stationSuivante = CheminLePlusCourt[i + 1] - 1;
-        tempsTotal += matriceAdjacence[stationInitiale, stationSuivante];    /// A chaque itération, on chercher le temps entre les deux stations dans la matrice d'adjacence.
-    }
+            for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
+            {
+                noeuds[i].couleur = "blanc";
+            }
 
-    
-     ///On affiche le chemin le plus court
-   
-    if (CheminLePlusCourt[0] != depart)
-    {
-        Console.WriteLine("Aucun chemin trouvé entre " + noeuds[depart - 1].nom + " et " + noeuds[arrivee - 1].nom);
-    }
-    else
-    {
-    
-    Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ-1].nom + " (n°" + noeuds[départ-1].idNoeud + ") et la station de métro " + noeuds[arrivée-1].nom + " (n°" + noeuds[arrivée-1].idNoeud + ") est le trajet : ");
-    for (int i = 0; i < CheminLePlusCourt.Count; i++)
-    {
-        if (i == CheminLePlusCourt.Count - 1)
-        {
-            Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom);
-        }
-        else
-        {
-            Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en associant chaque chiffre de la liste obtenue à son nom de station.
+
+
+            return CheminLePlusCourt;
         }
 
-    }
-    Console.WriteLine();
-    Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");         /// On affiche le temps total du trajet
 
-    }
-
-
-    for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
-    {
-        noeuds[i].couleur = "blanc";
-    }
-
-
-
-    return CheminLePlusCourt;
-}
-
-
-
-        public List<int> AlgorithmeBellmanFord(Noeud<T>[] noeuds, int ordre, int[,] matriceAdjacence )
+        /// <summary>
+        /// Algorithme de Bellmand-Ford permettant de trouver le plus court chemin entre deux stations
+        /// </summary>
+        /// <param name="noeuds"></param>
+        /// <param name="ordre"></param>
+        /// <param name="matriceAdjacence"></param>
+        /// <returns></returns>
+        public List<int> AlgorithmeBellmanFord(Noeud<T>[] noeuds, int ordre, int[,] matriceAdjacence)
         {
             List<int> CheminLePlusCourt = new List<int>();                           /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
             Console.WriteLine("Nous allons utiliser l'algorithme de Bellman-Ford pour déterminer le chemin le plus court entre deux sommet.");
@@ -522,12 +542,12 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
             }
 
             int infini = 999999999;    /// On donne une très grande valeur qui représente l'infini
-            
+
 
             int[] distance = new int[ordre];               /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
             int[] predecesseur = new int[ordre];
 
-            for (int i = 0; i < ordre; i++)                                      
+            for (int i = 0; i < ordre; i++)
             {
                 distance[i] = infini;                 /// On initalise toutes les distances à plus l'infini 
                 predecesseur[i] = -1;                 /// On initialise touts les prédecesseurs à -1 (nous avons choisi -1 pour représenté null) 
@@ -535,16 +555,16 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
             distance[départ - 1] = 0;            /// La distance du sommet de départ est mise à 0
 
 
-            
+
 
             for (int i = 0; i < ordre - 1; i++)  /// Le nombre d'itération sera limité au nombre d'arêtes du graphe
             {
                 for (int j = 1; j <= ordre; j++)
                 {
-                    for (int h = 0; h < noeuds[j-1].listevoisins.Count; h++)        /// On parcours chaque sommet et chaque élément de sa liste de voisins ce qui reviens à parcourir chaque arête du graphe
+                    for (int h = 0; h < noeuds[j - 1].listevoisins.Count; h++)        /// On parcours chaque sommet et chaque élément de sa liste de voisins ce qui reviens à parcourir chaque arête du graphe
                     {
-                        int voisin = noeuds[j-1].listevoisins[h] - 1;
-                        if (Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j-1, voisin] < distance[voisin])
+                        int voisin = noeuds[j - 1].listevoisins[h] - 1;
+                        if (Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin] < distance[voisin])
                         {
                             distance[voisin] = Convert.ToInt32(distance[j - 1]) + matriceAdjacence[j - 1, voisin];          /// Si la condition du if est respectée alors on met à jour la distance du voisin
                             predecesseur[voisin] = j - 1;                  /// Le prédecesseur du voisin deviens la source du lien
@@ -553,11 +573,11 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
                 }
             }
 
-           /// Pour que l'algorithme de Bellmann-Ford puisse s'appliquer, il faut s'assurer qu'il n'y pas de cycle absorbant
-           /// Il s'agit en fait de refaire une dernière itération et de voir si les distances changent
-           /// vérification de l'inexistance de cycle de poids strictement négatifs en fin d'algorithme:
-           
-            
+            /// Pour que l'algorithme de Bellmann-Ford puisse s'appliquer, il faut s'assurer qu'il n'y pas de cycle absorbant
+            /// Il s'agit en fait de refaire une dernière itération et de voir si les distances changent
+            /// vérification de l'inexistance de cycle de poids strictement négatifs en fin d'algorithme:
+
+
             for (int j = 1; j <= ordre; j++)
             {
                 for (int h = 0; h < noeuds[j - 1].listevoisins.Count; h++)       /// On vérifie donc chaque arêtes de la même manière
@@ -580,7 +600,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
                 SommetArr = predecesseur[SommetArr];               /// puis le prédecesseur du sommet deviens le nouveau sommet et ainsi de suite, jusqu'à remonter jusqu'au sommet de départ
             }
 
-          
+
 
             /// On calcule le temps du trajet
             int tempsTotal = 0;
@@ -594,37 +614,39 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
 
             ///On affiche le chemin le plus court
-            if (distance[arrivee - 1] == infini)
+            if (distance[arrivée - 1] == infini)
             {
-                Console.WriteLine(" Aucun chemin trouvé entre " + noeuds[depart - 1].nom + " et " + noeuds[arrivee - 1].nom);
+                Console.WriteLine(" Aucun chemin trouvé entre " + noeuds[départ - 1].nom + " et " + noeuds[arrivée - 1].nom);
             }
             else
             {
-  
-            Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ - 1].nom + " (n°" + noeuds[départ - 1].idNoeud + ") et la station de métro " + noeuds[arrivée - 1].nom + " (n°" + noeuds[arrivée - 1].idNoeud + ") est le trajet : ");
-            for (int i = 0; i < CheminLePlusCourt.Count; i++)
-            {
-                if (i == CheminLePlusCourt.Count - 1)
+                Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ - 1].nom + " (n°" + noeuds[départ - 1].idNoeud + ") et la station de métro " + noeuds[arrivée - 1].nom + " (n°" + noeuds[arrivée - 1].idNoeud + ") est le trajet : ");
+                for (int i = 0; i < CheminLePlusCourt.Count; i++)
                 {
-                    Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom);
-                }
-                else
-                {
-                    Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en transformant la associant chaque élément de la liste de chiffre obtenue à son nom de station.
-                }
+                    if (i == CheminLePlusCourt.Count - 1)
+                    {
+                        Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom);
+                    }
+                    else
+                    {
+                        Console.Write(noeuds[CheminLePlusCourt[i] - 1].nom + " --> ");          /// on affiche le chemin le plus court en transformant la associant chaque élément de la liste de chiffre obtenue à son nom de station.
+                    }
 
+                }
+                Console.WriteLine();
+                Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");  /// On affiche le temps total du trajet
             }
-            Console.WriteLine();
-            Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");  /// On affiche le temps total du trajet
 
-            }
+
 
             for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
             {
                 noeuds[i].couleur = "blanc";
             }
-             
+
 
             return CheminLePlusCourt;
         }
+    }
+}
 
