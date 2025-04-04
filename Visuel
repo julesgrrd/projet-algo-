@@ -1,146 +1,135 @@
 using SkiaSharp;
-using SkiaSharp.Views.Desktop;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 
-
-namespace Problème_scientifique_informatique
+namespace ProjetPSI
 {
-    public class Visuel 
+    public class Visuel
     {
-        public List<int>[] ListeAdjacence;
-        private Random random = new Random();
+        private Noeud<int>[] stations;
+        private int[,] relations;
 
-        public Visuel(List<int>[] ListeAdjacence)
+        public Visuel(Noeud<int>[] stations, int[,] relations)
         {
-            this.ListeAdjacence = ListeAdjacence;
+            this.stations = stations;
+            this.relations = relations;
         }
 
-        public void DessinerGraphe(string cheminFichier = "graphe.png")
+        public void GenererCarteAvecChemin(string cheminFichier, List<int> chemin, int largeur = 2800, int hauteur = 2400)
         {
-            int largeur = 1500;                    /// On définit les paramètre de la taille du graphe
-            int hauteur = 1500;  
-            int rayonNoeud = 40;
-            int distanceMin = 120;         /// distance minimale entre deux noeuds pour éviter le chevauchement
+            double minLat = stations.Min(s => s.latitude);
+            double maxLat = stations.Max(s => s.latitude);
+            double minLon = stations.Min(s => s.longitude);
+            double maxLon = stations.Max(s => s.longitude);
 
+            using var bitmap = new SKBitmap(largeur, hauteur);
+            using var canvas = new SKCanvas(bitmap);
+            canvas.Clear(SKColors.White);
 
-            int nombreNoeuds = ListeAdjacence.Length;        /// On initialise le nombre de noeud du graphe
-
-            SKBitmap bitmap = new SKBitmap(largeur, hauteur);    /// On crée l'espace ou le graphe sera dessiné
-            using (SKCanvas canvas = new SKCanvas(bitmap))
+            var paintLigne = new SKPaint
             {
-                canvas.Clear(SKColors.White);            
+                Style = SKPaintStyle.Stroke,
+                Color = SKColors.Gray,
+                StrokeWidth = 0.8f,
+                IsAntialias = true
+            };
 
-                Dictionary<int, SKPoint> positions = new Dictionary<int, SKPoint>();              /// Va contenir la position de chacun des noeuds.
-                
-                HashSet<SKPoint> usedPositions = new HashSet<SKPoint>();    ///HashSet empêche d'avoir deux fois la même position donc deux noeuds au même endroit
+            var paintLigneChemin = new SKPaint
+            {
+                Style = SKPaintStyle.Stroke,
+                Color = SKColors.Red,
+                StrokeWidth = 3,
+                IsAntialias = true
+            };
 
-                                
-                for (int i = 0; i < nombreNoeuds; i++)
-                {
-                    SKPoint newPosition;
-                    bool positionValide;
-                    do
-                    {
-                        positionValide = true;
-                        int x = random.Next(rayonNoeud, largeur - rayonNoeud);
-                        int y = random.Next(rayonNoeud, hauteur - rayonNoeud);
-                        newPosition = new SKPoint(x, y);                                     /// on définit la position des noeuds de manière aléatoire.
+            var paintStation = new SKPaint
+            {
+                Color = SKColors.Blue,
+                IsAntialias = true
+            };
 
-                        foreach (var pos in usedPositions)
-                        {
-                            float distance = (float)Math.Sqrt(Math.Pow(newPosition.X - pos.X, 2) + Math.Pow(newPosition.Y - pos.Y, 2));        /// On calcule la distance entre le centre du nouveau point et celui des points déjà existants.
-                            while (distance < distanceMin)                        /// Tant que cette distance est inférieur à la distance minimale autorisée, on calcul une nouvelle position.
-                            {
-                                newPosition.X += random.Next(-50, 50);
-                                newPosition.Y += random.Next(-50, 50);
-                                positionValide = false;
-                                distance = (float)Math.Sqrt(Math.Pow(newPosition.X - pos.X, 2) + Math.Pow(newPosition.Y - pos.Y, 2));    /// On calcul la nouvelle distance à partir du nouveau point et on compare à nouveau avec la distance minimale
-                            }
-                        }
-                        
-                    }
-                    while (usedPositions.Contains(newPosition) && positionValide == true);         /// Cela permet d'éviter les doublons
-                    
-                    positions[i] = newPosition;  
-                    usedPositions.Add(newPosition); /// on ajoute la nouvelle position à "usedPositions" pour pouvoir vérifier ensuite qu'il n'y aura pas de doublons de cette position.
-                    
-                }
+            var paintStationChemin = new SKPaint
+            {
+                Color = SKColors.Red,
+                IsAntialias = true
+            };
 
-            
-                using (SKPaint paintArete = new SKPaint
-                {
-                    Color = SKColors.Black,
-                    StrokeWidth = 2,
-                })
+            var paintTexte = new SKPaint
+            {
+                Color = SKColors.Black,
+                TextSize = 12,
+                IsAntialias = true
+            };
 
+            // Tracer les liaisons normales
+            for (int i = 0; i < relations.GetLength(0); i++)
+            {
+                int id1 = relations[i, 0];
+                int id2 = relations[i, 1];
 
+                var s1 = stations.FirstOrDefault(s => s.idNoeud == id1);
+                var s2 = stations.FirstOrDefault(s => s.idNoeud == id2);
 
-                using (SKPaint paintNoeud = new SKPaint                         /// ces trois fonctions "using" permettement de définir l'apparence des différents éléments
-                {                                                               /// du graphe (arête, noeud, texte) : couleur, taille, épaisseur du trait...
-                    Color = SKColors.Blue,
-                })
+                if (s1 == null || s2 == null) continue;
 
+                var p1 = ConvertirCoordonnees(s1.longitude, s1.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
+                var p2 = ConvertirCoordonnees(s2.longitude, s2.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
 
-
-                using (SKPaint paintTexte = new SKPaint
-                {
-                    Color = SKColors.White,
-                    TextSize = 40,
-                    TextAlign = SKTextAlign.Center        /// le texte sera centré dans le cercle représentant le noeud
-                })
-
-
-
-                {
-                    /// On dessine les arêtes
-                    for (int i = 1; i <= nombreNoeuds; i++)
-                    {
-                        foreach (int voisin in ListeAdjacence[i-1])
-                        {
-                            canvas.DrawLine(positions[i-1], positions[voisin-1], paintArete);
-                        }
-                    }
-
-
-                    /// On dessine les nœuds
-                    foreach (var kvp in positions)
-                    {
-                       
-                        int index = kvp.Key;
-                        SKPoint position = kvp.Value;
-                        canvas.DrawCircle(position, rayonNoeud, paintNoeud);                                    /// Le cercle représentant le noeud est dessiné
-                        canvas.DrawText((index+1).ToString(), position.X, position.Y + 7, paintTexte);          /// Le numéro du noeud est écrit au centre du cercle
-                        
-
-                     
-                    }
-                }
+                canvas.DrawLine(p1, p2, paintLigne);
             }
 
-            /// On sauvegarde l'image PNG
-            using (SKImage image = SKImage.FromBitmap(bitmap))
-            using (SKData data = image.Encode(SKEncodedImageFormat.Png, 100))
-            using (System.IO.Stream stream = System.IO.File.OpenWrite(cheminFichier))
+            // Tracer les liaisons du chemin en rouge
+            for (int i = 0; i < chemin.Count - 1; i++)
             {
-                data.SaveTo(stream);
+                var s1 = stations.FirstOrDefault(s => s.idNoeud == chemin[i]);
+                var s2 = stations.FirstOrDefault(s => s.idNoeud == chemin[i + 1]);
+
+                if (s1 == null || s2 == null) continue;
+
+                var p1 = ConvertirCoordonnees(s1.longitude, s1.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
+                var p2 = ConvertirCoordonnees(s2.longitude, s2.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
+
+                canvas.DrawLine(p1, p2, paintLigneChemin);
             }
 
-            Console.WriteLine($"Graphe sauvegardé sous : {cheminFichier}");
+            // Tracer les stations
+            foreach (var s in stations)
+            {
+                var p = ConvertirCoordonnees(s.longitude, s.latitude, minLon, minLat, maxLon, maxLat, largeur, hauteur);
 
+                var paint = chemin.Contains(s.idNoeud) ? paintStationChemin : paintStation;
+                canvas.DrawCircle(p, chemin.Contains(s.idNoeud) ? 3.5f : 2, paint);
 
-            ///On affiche l'image créée automatiquement
-            string imagePath = "graphe.png";   
-            Process.Start(new ProcessStartInfo(imagePath) { UseShellExecute = true });
+                string nomCourt = s.nom.Length > 20 ? s.nom.Substring(0, 20) + "…" : s.nom;
+                canvas.DrawText(nomCourt, p.X + 5, p.Y - 5, paintTexte);
+            }
 
+            using var image = SKImage.FromBitmap(bitmap);
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            using var stream = File.OpenWrite(cheminFichier);
+            data.SaveTo(stream);
+
+            Console.WriteLine("\nCarte avec chemin générée : PlanMetro.png");
+            Process.Start(new ProcessStartInfo(cheminFichier) { UseShellExecute = true });
         }
 
 
+        private SKPoint ConvertirCoordonnees(double lon, double lat, double minLon, double minLat, double maxLon, double maxLat, int largeur, int hauteur)
+        {
+            float padding = 50f;
+            float x = padding + (float)((lon - minLon) / (maxLon-minLon) * (largeur - 2 * padding));
+            float y = padding + (float)((maxLat - lat) / (maxLat-minLat) * (hauteur - 2 * padding));
+            return new SKPoint(x, y);
+        }
 
-}
+        private double maxLat => stations.Max(s => s.latitude);
+
+ 
+
+
+    }
 }
