@@ -1,44 +1,44 @@
-using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace ProjetPSI
 {
-    public class Noeud <T>
+    public class Noeud<T>
     {
-        public int idNoeud { get; set; }
-        public T nom { get; set; }
-        public double latitude { get; set; }      
+        public T idNoeud { get; set; }
+        public string nom { get; set; }
         public double longitude { get; set; }
-        public int codeInsee { get; set; }
+        public double latitude { get; set; }
+        public string ligneStation { get; set; }
         public string couleur { get; set; }
         public List<int> listevoisins { get; set; }
 
-        public Noeud(int idNoeud, T nom, double latitude, double longitude, int codeInsee, string couleur, List<int> listevoisins)           /// on écrit le constructeur de la classe Noeud contenant les différents attributs de la classe.
+        // Constructeur principal avec voisins
+        public Noeud(T idNoeud, string nom, string couleur, List<int> listevoisins)
         {
             this.idNoeud = idNoeud;
             this.nom = nom;
-            this.latitude = latitude;
-            this.longitude = longitude;
-            this.codeInsee = codeInsee;
             this.couleur = couleur;
-            this.listevoisins = listevoisins;
+            this.listevoisins = listevoisins ?? new List<int>();
         }
 
-        public Noeud (int idNoeud, string couleur, List<int> listevoisins)
+        public Noeud(T idNoeud, string nom, double longitude, double latitude, string ligneStation, List<int> listevoisins)
         {
             this.idNoeud = idNoeud;
-            this.couleur = couleur;
-            this.listevoisins = listevoisins;
-        } 
+            this.nom = nom;
+            this.longitude = longitude;
+            this.latitude = latitude;
+            this.ligneStation = ligneStation;
+            this.couleur = "blanc";
+            this.listevoisins = new List<int>();
+        }
 
-        public void AjouterVoisin (int idVoisin)
+        // Ajouter un voisin à la liste
+        public void AjouterVoisin(int idVoisin)
         {
-            if (listevoisins.Contains(idVoisin)==false)
+            if (!listevoisins.Contains(idVoisin))
             {
                 listevoisins.Add(idVoisin);
             }
         }
-
-
     }
 }
