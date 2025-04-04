@@ -444,7 +444,16 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         tempsTotal += matriceAdjacence[stationInitiale, stationSuivante];    /// A chaque itération, on chercher le temps entre les deux stations dans la matrice d'adjacence.
     }
 
+    
      ///On affiche le chemin le plus court
+   
+    if (CheminLePlusCourt[0] != depart)
+    {
+        Console.WriteLine("Aucun chemin trouvé entre " + noeuds[depart - 1].nom + " et " + noeuds[arrivee - 1].nom);
+    }
+    else
+    {
+    
     Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ-1].nom + " (n°" + noeuds[départ-1].idNoeud + ") et la station de métro " + noeuds[arrivée-1].nom + " (n°" + noeuds[arrivée-1].idNoeud + ") est le trajet : ");
     for (int i = 0; i < CheminLePlusCourt.Count; i++)
     {
@@ -461,7 +470,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
     Console.WriteLine();
     Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");         /// On affiche le temps total du trajet
 
-
+    }
 
 
     for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
@@ -585,6 +594,13 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
 
             ///On affiche le chemin le plus court
+            if (distance[arrivee - 1] == infini)
+            {
+                Console.WriteLine(" Aucun chemin trouvé entre " + noeuds[depart - 1].nom + " et " + noeuds[arrivee - 1].nom);
+            }
+            else
+            {
+  
             Console.WriteLine("Le chemin le plus court entre la station de métro " + noeuds[départ - 1].nom + " (n°" + noeuds[départ - 1].idNoeud + ") et la station de métro " + noeuds[arrivée - 1].nom + " (n°" + noeuds[arrivée - 1].idNoeud + ") est le trajet : ");
             for (int i = 0; i < CheminLePlusCourt.Count; i++)
             {
@@ -601,7 +617,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
             Console.WriteLine();
             Console.WriteLine("Ce trajet durera : " + tempsTotal + " minutes.");  /// On affiche le temps total du trajet
 
-
+            }
 
             for (int i = 0; i < noeuds.Length; i++)      /// à la fin du programme, on remet la couleur de chaque noeud à blanc pour pouvoir réaliser le reste des fonctions.
             {
