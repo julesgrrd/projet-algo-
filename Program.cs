@@ -8,7 +8,7 @@ namespace ProjetPSI
     using Xamarin.Forms.Shapes;
     using OfficeOpenXml;
     using System.Runtime.CompilerServices;
-    using Projet_PSI;
+    using ProjetPSI;
     using SkiaSharp;
 
     public class Program
@@ -34,7 +34,7 @@ namespace ProjetPSI
                     ExcelWorksheet worksheet2 = package.Workbook.Worksheets[0];
 
                     matrice_relation = new int[worksheet1.Dimension.End.Row - 2, 4];
-                    matrice_infoStation = new string[worksheet2.Dimension.End.Row - 1, 4];
+                    matrice_infoStation = new string[worksheet2.Dimension.End.Row - 1, 5];
 
                     for (int ligne = 2; ligne < worksheet1.Dimension.End.Row; ligne++)
                     {
@@ -55,6 +55,7 @@ namespace ProjetPSI
                     for (int ligne = 2; ligne <= 329; ligne++)
                     {
                         string idStation2 = Convert.ToString(worksheet2.Cells[ligne, 1].Value);
+                        string ligneStation = Convert.ToString(worksheet2.Cells[ligne, 2].Value);
                         string nomStation = Convert.ToString(worksheet2.Cells[ligne, 3].Value);
                         string longitudeStation = Convert.ToString(worksheet2.Cells[ligne, 4].Value);
                         string latitudeStation = Convert.ToString(worksheet2.Cells[ligne, 5].Value);
@@ -62,6 +63,7 @@ namespace ProjetPSI
                         matrice_infoStation[ligne - 2, 1] = nomStation;
                         matrice_infoStation[ligne - 2, 2] = longitudeStation;
                         matrice_infoStation[ligne - 2, 3] = latitudeStation;
+                        matrice_infoStation[ligne - 2, 4] = ligneStation;
                     }
                 }
             }
@@ -78,50 +80,57 @@ namespace ProjetPSI
             GrapheMetro.SommaireMetro(matrice_infoStation);
 
 
-            /// Tableau de noeuds pour la visualisation
-            Noeud<int>[] noeudsVisuel = new Noeud<int>[ordre];          /// On initialise un tableau noeuds de Noeud.
+            /// On initialise un tableau de noeuds noeudsVisuel qui servira pour la visualisation du plan de métro
+            Noeud<int>[] noeudsVisuel = new Noeud<int>[ordre];     
             for(int i = 0; i < ordre; i++)
             {
+                string nom = "";
                 double longitude = 0;
                 double latitude = 0;
-                string nom = "";
+                string ligneStation = "";
 
-                nom = matrice_infoStation[i, 1];
-                longitude = double.Parse(matrice_infoStation[i, 2]);
-                latitude = double.Parse(matrice_infoStation[i, 3]);
+                for (int j = 0; j < ordre; j++)
+                {
+                    if (Convert.ToInt32(matrice_infoStation[j, 0]) == i + 1)
+                    {
+                        nom = matrice_infoStation[j, 1];
+                        longitude = double.Parse(matrice_infoStation[j, 2]);
+                        latitude = double.Parse(matrice_infoStation[j, 3]);
+                        ligneStation = matrice_infoStation[j, 4];
+                    }
+                }
 
-                noeudsVisuel[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ListeAdjacence[i]);
+                noeudsVisuel[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ligneStation, ListeAdjacence[i]);
             }
 
-
-            /// tableau de noeuds pour les algorithmes
-            Noeud<int> [] noeuds = new Noeud<int> [ordre];          /// On initialise un tableau noeuds de Noeud.
+            /// On initialise un tableau de noeuds noeuds pour les algorithmes
+            Noeud<int>[] noeuds = new Noeud<int>[ordre];        
             for (int i = 0; i < ordre; i++)
             {
                 string nom = "";
                 for (int j = 0; j < ordre; j++)
                 {
-                    if (Convert.ToInt32(matrice_nomStation[j, 0]) == i + 1)
+                    if (Convert.ToInt32(matrice_infoStation[j, 0]) == i + 1)
                     {
-                        nom = matrice_nomStation[j, 1];
+                        nom = matrice_infoStation[j, 1];
                     }
                 }
-                noeuds[i] = new Noeud<int> (i+1, nom, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
+                noeuds[i] = new Noeud<int>(i + 1, nom, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
             }
 
-
-            Visuel visuel = new Visuel(noeuds, matrice_relation);
-            visuel.GenererCarte("metro.png");
-
-
-
-            GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
             Console.WriteLine();
-            graphe.AlgorithmeBellmanFord(noeuds, ordre, matriceAdjacence);
+            var PCC = GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
             Console.WriteLine();
+            Console.Write("******************************************************************\n\n");
+            GrapheMetro.AlgorithmeBellmanFord(noeuds, ordre, MatriceAdjacence);
+            Console.WriteLine();
+            Console.Write("******************************************************************\n\n");
             GrapheMetro.AlgorithmeFloydWarshall(MatriceAdjacence, ordre, noeuds);
-            
-            Console.ReadKey();
+
+            Visuel visuel = new Visuel(noeudsVisuel, matrice_relation);
+            visuel.GenererCarteAvecChemin("PlanMetro.png", PCC);
+
+
         }
     }
 
