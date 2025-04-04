@@ -16,12 +16,12 @@ namespace ProjetPSI
         static void Main(string[] args)
         {
             string fichier = "..\\net7.0\\MetroParis.xlsx";                /// On accède au fichier excel MetroParis contenant tous les liens du graphe
-            int[,] matrice_relation = null;
+            int[,] matrice_relation = null;                             /// On initalise deux matrices que nous utiliserons par la suite
             string[,] matrice_infoStation = null;
 
             if (!File.Exists(fichier))
             {
-                Console.WriteLine("Le fichier n'existe pas.");             /// Si il n'existe pas, l'utilisateur est informé
+                Console.WriteLine("Le fichier n'existe pas.");             /// Si le fichier n'existe pas, l'utilisateur est informé
                 return;
             }
             else
