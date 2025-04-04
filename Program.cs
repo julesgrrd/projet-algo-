@@ -39,29 +39,29 @@ namespace ProjetPSI
                     /// Boucle qui permet de convertir les valeurs de l'excel (feuille 2) en entier
                     for (int ligne = 2; ligne < worksheet1.Dimension.End.Row; ligne++)
                     {
-                        int idStation1 = Convert.ToInt32(worksheet1.Cells[ligne, 1].Value);
-                        int idVoisin = Convert.ToInt32(worksheet1.Cells[ligne, 3].Value);
-                        int doubleSens = Convert.ToInt32(worksheet1.Cells[ligne, 4].Value);
-                        int poids = Convert.ToInt32(worksheet1.Cells[ligne, 5].Value);
+                        int idStation1 = Convert.ToInt32(worksheet1.Cells[ligne, 1].Value);    /// Identifiant de la station
+                        int idVoisin = Convert.ToInt32(worksheet1.Cells[ligne, 3].Value);    /// Identifiant d'une station voisine à idStation1 
+                        int doubleSens = Convert.ToInt32(worksheet1.Cells[ligne, 4].Value);    /// doubleSens est égale à 1 si la relation entre idStation1 et idVoisin 
+                        int poids = Convert.ToInt32(worksheet1.Cells[ligne, 5].Value);    /// temps entre idStation1 et idVoisin       
 
                         /// On remplit la matrice avec les données de la feuille Arcs
                         if (idStation1 != null && idVoisin != null) /// Permet de vérifier que l'indice de la station et du voisin ne sont pas null
                         {
-                            matrice_relation[ligne - 2, 0] = idStation1;
-                            matrice_relation[ligne - 2, 1] = idVoisin;
-                            matrice_relation[ligne - 2, 2] = doubleSens;
-                            matrice_relation[ligne - 2, 3] = poids;
+                            matrice_relation[ligne - 2, 0] = idStation1;   
+                            matrice_relation[ligne - 2, 1] = idVoisin;   
+                            matrice_relation[ligne - 2, 2] = doubleSens; 
+                            matrice_relation[ligne - 2, 3] = poids; 
                         }
                     }
 
                     /// Boucle qui permet de convertir les valeurs de l'excel (feuille 1) en string
                     for (int ligne = 2; ligne <= 329; ligne++)
                     {
-                        string idStation2 = Convert.ToString(worksheet2.Cells[ligne, 1].Value);
-                        string ligneStation = Convert.ToString(worksheet2.Cells[ligne, 2].Value);
-                        string nomStation = Convert.ToString(worksheet2.Cells[ligne, 3].Value);
-                        string longitudeStation = Convert.ToString(worksheet2.Cells[ligne, 4].Value);
-                        string latitudeStation = Convert.ToString(worksheet2.Cells[ligne, 5].Value);
+                        string idStation2 = Convert.ToString(worksheet2.Cells[ligne, 1].Value);    /// Identifiant de la station
+                        string ligneStation = Convert.ToString(worksheet2.Cells[ligne, 2].Value);    /// Ligne sur laquelle est située de la station
+                        string nomStation = Convert.ToString(worksheet2.Cells[ligne, 3].Value);    /// Nom de la station  
+                        string longitudeStation = Convert.ToString(worksheet2.Cells[ligne, 4].Value);    /// Longitude de l'emplacement de la station
+                        string latitudeStation = Convert.ToString(worksheet2.Cells[ligne, 5].Value);    /// Latitude de l'emplacement de la station
 
                         /// On remplit la matrice avec les données de la feuille Noeuds
                         matrice_infoStation[ligne - 2, 0] = idStation2;
