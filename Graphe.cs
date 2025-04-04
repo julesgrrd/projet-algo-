@@ -98,7 +98,7 @@ namespace ProjetPSI
 
     for (int i = 0; i < nbLigne; i++)
     {
-        int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);
+        int idStation1 = Convert.ToInt32(matrice_relation[i, 0]);                 
         int idStation2 = Convert.ToInt32(matrice_relation[i, 1]);
         int doubleSens = Convert.ToInt32(matrice_relation[i, 2]);
 
@@ -107,9 +107,9 @@ namespace ProjetPSI
             continue;
         }
 
-        ListeAdjacence[idStation1 - 1].Add(idStation2);
+        ListeAdjacence[idStation1 - 1].Add(idStation2);            /// Pour tous les liens de la matrice relation, on ajoute le voisin du sommet dans la liste d'adjacence du sommet
 
-        if (doubleSens==1)
+        if (doubleSens==1)                                         /// Si "doubleSens==1", la relation est réciproque donc on ajoute également le somet dans la liste d'adjacence du voisin.
         {
             ListeAdjacence[idStation2 - 1].Add(idStation1);
         }
