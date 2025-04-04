@@ -30,12 +30,13 @@ namespace ProjetPSI
                 ExcelPackage.License.SetNonCommercialPersonal("ProjetPSI");
                 using (var package = new ExcelPackage(fichierInfo))
                 {
-                    ExcelWorksheet worksheet1 = package.Workbook.Worksheets[1];
-                    ExcelWorksheet worksheet2 = package.Workbook.Worksheets[0];
+                    ExcelWorksheet worksheet1 = package.Workbook.Worksheets[1];    /// Acces à la seconde feuille 'Arcs' de l'excel MetroParis
+                    ExcelWorksheet worksheet2 = package.Workbook.Worksheets[0];    /// Acces à la premiere feuille 'Noeuds' de l'excel MetroParis   
 
-                    matrice_relation = new int[worksheet1.Dimension.End.Row - 2, 4];
+                    matrice_relation = new int[worksheet1.Dimension.End.Row - 2, 4];    /// On enlève 2 au nombre de lignes des deux matrices car on ne prend pas en compte la première ligne de l'excel correspond au titre des colonnes
                     matrice_infoStation = new string[worksheet2.Dimension.End.Row - 1, 5];
 
+                    /// Boucle qui permet de convertir les valeurs de l'excel (feuille 2) en entier
                     for (int ligne = 2; ligne < worksheet1.Dimension.End.Row; ligne++)
                     {
                         int idStation1 = Convert.ToInt32(worksheet1.Cells[ligne, 1].Value);
@@ -43,7 +44,8 @@ namespace ProjetPSI
                         int doubleSens = Convert.ToInt32(worksheet1.Cells[ligne, 4].Value);
                         int poids = Convert.ToInt32(worksheet1.Cells[ligne, 5].Value);
 
-                        if (idStation1 != null && idVoisin != null)
+                        /// On remplit la matrice avec les données de la feuille Arcs
+                        if (idStation1 != null && idVoisin != null) /// Permet de vérifier que l'indice de la station et du voisin ne sont pas null
                         {
                             matrice_relation[ligne - 2, 0] = idStation1;
                             matrice_relation[ligne - 2, 1] = idVoisin;
@@ -52,6 +54,7 @@ namespace ProjetPSI
                         }
                     }
 
+                    /// Boucle qui permet de convertir les valeurs de l'excel (feuille 1) en string
                     for (int ligne = 2; ligne <= 329; ligne++)
                     {
                         string idStation2 = Convert.ToString(worksheet2.Cells[ligne, 1].Value);
@@ -59,6 +62,8 @@ namespace ProjetPSI
                         string nomStation = Convert.ToString(worksheet2.Cells[ligne, 3].Value);
                         string longitudeStation = Convert.ToString(worksheet2.Cells[ligne, 4].Value);
                         string latitudeStation = Convert.ToString(worksheet2.Cells[ligne, 5].Value);
+
+                        /// On remplit la matrice avec les données de la feuille Noeuds
                         matrice_infoStation[ligne - 2, 0] = idStation2;
                         matrice_infoStation[ligne - 2, 1] = nomStation;
                         matrice_infoStation[ligne - 2, 2] = longitudeStation;
@@ -69,15 +74,14 @@ namespace ProjetPSI
             }
 
 
-            Graphe<int> GrapheMetro = new Graphe<int>(matrice_relation, matrice_infoStation);
+            Graphe<int> GrapheMetro = new Graphe<int>(matrice_relation, matrice_infoStation); /// On crée un graphe GrapheMetro à partir de la classe Graphe
 
-            int ordre = GrapheMetro.OrdreDuGraphe(matrice_relation);
-            int taille = GrapheMetro.TailleDuGraphe(matrice_relation);
-            List<int>[] ListeAdjacence = GrapheMetro.GenererListeAdjacence(matrice_relation, ordre);
-            bool Oriente = GrapheMetro.GrapheOriente(ListeAdjacence);
-            int[,] MatriceAdjacence = GrapheMetro.GenererMatriceAdjacence(matrice_relation, ordre);
+            int ordre = GrapheMetro.OrdreDuGraphe(matrice_relation);    /// On appelle la fonction OrdreDuGraphe pour obtenir l'ordre du graphe
+            int taille = GrapheMetro.TailleDuGraphe(matrice_relation);    /// On appelle la fonction TailleDuGraphe pour obtenir la taille du graphe
+            List<int>[] ListeAdjacence = GrapheMetro.GenererListeAdjacence(matrice_relation, ordre);    /// On appelle la fonction ListeAdjacence pour obtenir la liste d'adjacence du graphe
+            int[,] MatriceAdjacence = GrapheMetro.GenererMatriceAdjacence(matrice_relation, ordre);    /// On appelle la fonction MatriceAdjacence pour obtenir la matrice d'adjacence du graphe
 
-            GrapheMetro.SommaireMetro(matrice_infoStation);
+            GrapheMetro.SommaireMetro(matrice_infoStation);    /// On appelle la fonction SommaireMetro qui permet d'afficher le sommaire des stations de métro avec leur identifant et nom
 
 
             /// On initialise un tableau de noeuds noeudsVisuel qui servira pour la visualisation du plan de métro
@@ -100,10 +104,10 @@ namespace ProjetPSI
                     }
                 }
 
-                noeudsVisuel[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ligneStation, ListeAdjacence[i]);
+                noeudsVisuel[i] = new Noeud<int>(i + 1, nom, longitude, latitude, ligneStation, ListeAdjacence[i]);    /// Chaque noeud est défini par son identifiant, son nom, sa longitude, sa latitude, la ligne à laquelle elle appartient et la liste de ses voisins
             }
 
-            /// On initialise un tableau de noeuds noeuds pour les algorithmes
+            /// On initialise un tableau de noeuds noeuds pour les algorithmes du PCC
             Noeud<int>[] noeuds = new Noeud<int>[ordre];        
             for (int i = 0; i < ordre; i++)
             {
@@ -115,20 +119,20 @@ namespace ProjetPSI
                         nom = matrice_infoStation[j, 1];
                     }
                 }
-                noeuds[i] = new Noeud<int>(i + 1, nom, "blanc", ListeAdjacence[i]);            /// Tous les noeuds de graphe prennent en paramètre un numéro i, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
+                noeuds[i] = new Noeud<int>(i + 1, nom, "blanc", ListeAdjacence[i]);    /// Tous les noeuds de graphe prennent en paramètre un identifiant i+1, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
             }
 
             Console.WriteLine();
             var PCC = GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
             Console.WriteLine();
-            Console.Write("******************************************************************\n\n");
+            Console.Write("******************************************************************\n\n");    /// Ligne d'étoile pour rendre la visualisation du PCC plus esthétique
             GrapheMetro.AlgorithmeBellmanFord(noeuds, ordre, MatriceAdjacence);
             Console.WriteLine();
             Console.Write("******************************************************************\n\n");
             GrapheMetro.AlgorithmeFloydWarshall(MatriceAdjacence, ordre, noeuds);
 
-            Visuel visuel = new Visuel(noeudsVisuel, matrice_relation);
-            visuel.GenererCarteAvecChemin("PlanMetro.png", PCC);
+            Visuel visuel = new Visuel(noeudsVisuel, matrice_relation);    /// On crée un visuel à partir de la classe Visuel
+            visuel.GenererCarteAvecChemin("PlanMetro.png", PCC);    /// On appelle la fonction GenererCarteAvecChemin qui affichera une image représentant le plan du métro avec le PCC entre deux stations
 
 
         }
