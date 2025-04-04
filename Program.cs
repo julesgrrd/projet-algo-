@@ -47,10 +47,10 @@ namespace ProjetPSI
                         /// On remplit la matrice avec les données de la feuille Arcs
                         if (idStation1 != null && idVoisin != null) /// Permet de vérifier que l'indice de la station et du voisin ne sont pas null
                         {
-                            matrice_relation[ligne - 2, 0] = idStation1;   
-                            matrice_relation[ligne - 2, 1] = idVoisin;   
-                            matrice_relation[ligne - 2, 2] = doubleSens; 
-                            matrice_relation[ligne - 2, 3] = poids; 
+                            matrice_relation[ligne - 2, 0] = idStation1;
+                            matrice_relation[ligne - 2, 1] = idVoisin;
+                            matrice_relation[ligne - 2, 2] = doubleSens;
+                            matrice_relation[ligne - 2, 3] = poids;
                         }
                     }
 
@@ -86,8 +86,8 @@ namespace ProjetPSI
 
 
             /// On initialise un tableau de noeuds noeudsVisuel qui servira pour la visualisation du plan de métro
-            Noeud<int>[] noeudsVisuel = new Noeud<int>[ordre];     
-            for(int i = 0; i < ordre; i++)
+            Noeud<int>[] noeudsVisuel = new Noeud<int>[ordre];
+            for (int i = 0; i < ordre; i++)
             {
                 string nom = "";
                 double longitude = 0;
@@ -109,7 +109,7 @@ namespace ProjetPSI
             }
 
             /// On initialise un tableau de noeuds noeuds pour les algorithmes du PCC
-            Noeud<int>[] noeuds = new Noeud<int>[ordre];        
+            Noeud<int>[] noeuds = new Noeud<int>[ordre];
             for (int i = 0; i < ordre; i++)
             {
                 string nom = "";
