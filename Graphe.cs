@@ -150,10 +150,10 @@ namespace ProjetPSI
         {
             if (i == j)
             {
-                MatriceAdjacence[i, j] = 0;
+                MatriceAdjacence[i, j] = 0;                    /// Tous les éléments sur la diagonale de la matrice sont mis à zéro
             } else
             {
-                MatriceAdjacence[i, j] = infini;
+                MatriceAdjacence[i, j] = infini;               /// Les autres sont mis à infini en attendant d'être modifié par la suite si il existe un lien
             }
         }
     }
@@ -171,13 +171,13 @@ namespace ProjetPSI
             continue;
         }
 
-        if (doubleSens==1)
+        if (doubleSens==1)     
         {
-            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     /// on rempli la matrice grâce à la matrice relation : on met des 1 lorsque les sommets i et j sont voisins.
-            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1, Convert.ToInt32(matrice_relation[i, 0]) - 1] = poids;
+            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     /// on rempli la matrice grâce à la matrice relation : matriceAdjacence[i,j] correspond au poids du lien entre i et j lorsque les sommets i et j sont voisins.
+            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 1]) - 1, Convert.ToInt32(matrice_relation[i, 0]) - 1] = poids;     /// Les relations sont réciproques donc on fait l'opération dans les deux sens
         } else
         {
-            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;
+            MatriceAdjacence[Convert.ToInt32(matrice_relation[i, 0]) - 1, Convert.ToInt32(matrice_relation[i, 1]) - 1] = poids;     ///Ici la relation n'est pas réciproque donc on complète dans un sens seulement
         }
        
     }
