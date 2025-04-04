@@ -4,148 +4,233 @@ using System.Collections.Generic;
 namespace ProjetPSI
 {
     [TestClass]
-    public sealed class Test1
+public sealed class Test1
+{
+
+    /// <summary>
+    /// Test de la fonction Taille du graphe
+    /// </summary>
+
+    [TestMethod]
+    public void Test_Tailledugraphe()
     {
-
-        /// <summary>
-        /// Test de la fonction Taille du graphe
-        /// </summary>
-
-        [TestMethod]
-        public void Test_Tailledugraphe()
-        {
-            int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
-            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" } };
-            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
-            int taille = graphe.TailleDuGraphe(matrice_relation);
-            Assert.AreEqual(5, taille);
-
-        }
-
-
-        /// <summary>
-        /// Test de la fonction Ordre du graphe
-        /// </summary>
-
-        [TestMethod]
-        public void Test_OrdreDuGraphe()
-        {
-            int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
-            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" } };
-            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
-            int result = graphe.OrdreDuGraphe(matrice_relation);
-            Assert.AreEqual(4, result);
-
-        }
-
-
-
-        /// <summary>
-        /// Test de la fonction GenererListeAdjacence
-        /// </summary>
-
-        [TestMethod]
-        public void Test_GenererListeAdjacence()
-        {
-            int[,] matrice_relation = { { 1, 3 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 2 } };
-            int ordre = 5;
-            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" }, { "5", "Champs-Elysees Clemenceau" } };
-            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
-            List<int>[] resultat = graphe.GenererListeAdjacence(matrice_relation, ordre);
-            Dictionary<int, List<int>> adjacenceAttendue = new Dictionary<int, List<int>>
-            {
-                { 0, new List<int> { 3 } },
-                { 1, new List<int> { 3, 5 } },
-                { 2, new List<int> { 1, 2, 4 } },
-                { 3, new List<int> { 3, 5 } },
-                { 4, new List<int> { 2, 4 } }
-            };
-            foreach (var sommet in adjacenceAttendue.Keys)
-            {
-                Assert.AreEqual(adjacenceAttendue[sommet].Count, resultat[sommet].Count);
-                foreach (int voisinAttendu in adjacenceAttendue[sommet])
-                {
-                    CollectionAssert.Contains(resultat[sommet], voisinAttendu);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Test de la fonction Graphe Orienté
-        /// </summary>
-
-        [TestMethod]
-        public void Test_GrapheOriente()
-        {
-            int[,] matrice_relation = { { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 2 } };
-            int ordre = 4;
-            string[,] matrice_nomStation = { { "1", "Porte Maillot" }, { "2", "Argentine" }, { "3", "Georges V" }, { "4", "Charles de Gaulle Etoile" } };
-            Graphe<int> graphe = new Graphe<int>(matrice_relation, matrice_nomStation);
-            List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
-            bool resultat = graphe.GrapheOriente(listeAdjacence);
-            Assert.IsTrue(resultat);
-        }
+        int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
+        Graphe<int> gra = new Graphe<int>(matrice_relation);
+        int taille = gra.TailleDuGraphe(matrice_relation);
+        Assert.AreEqual(5, taille);
 
     }
 
 
-        /// <summary>
-        /// Test du parcours en profondeur
-        /// </summary>
+    /// <summary>
+    /// Test de la fonction Ordre du graphe
+    /// </summary>
 
-        [TestMethod]
-        public void Test_ParcoursEnProfondeur()
-        {
-            int[,] matrice_relation = { { 1, 2 }, { 1, 3 }, { 2, 4 }, { 3, 5 }, { 4, 5 } };
-            int ordre = 5;
-            Graphe <int> graphe = new Graphe <int>(matrice_relation);
-            List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
-            Noeud<int>[] noeuds = new Noeud<int>[ordre];
-            for (int i = 0; i < ordre; i++)
-            {
-                noeuds[i] = new Noeud<int>(i + 1, "blanc", listeAdjacence[i]);
-            }
-            using (StringReader sr = new StringReader("1"))                           /// Le StringReader permet d'avoir une entrée au moment de la requête "Console.ReadLine" qui solicite l'utilisateur
-            {
-                Console.SetIn(sr);
-                List<int> resultat = graphe.ParcoursEnProfondeurDabord(noeuds, matrice_relation);
-                List<int> resultatFiltre = resultat.Distinct().ToList();
-                List<int> parcoursAttendu = new List<int> { 1, 2, 4, 5, 3 };
-                Assert.AreEqual(parcoursAttendu.Count, resultatFiltre.Count);
-                CollectionAssert.AreEquivalent(parcoursAttendu, resultatFiltre);
-            }
-            Console.SetIn(new StringReader("1"));
-        }
-
-
-        /// <summary>
-        /// Test du parcours en largeur
-        /// </summary>
-
-        [TestMethod]
-        public void Test_ParcoursEnLargeur()
-        {
-            int[,] matrice_relation = { { 1, 2 }, { 1, 3 }, { 2, 4 }, { 3, 5 }, { 4, 5 } };
-            int ordre = 5;
-            Graphe<int> graphe = new Graphe<int>(matrice_relation);
-            List<int>[] listeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
-            Noeud<int>[] noeuds = new Noeud<int>[ordre];
-            for (int i = 0; i < ordre; i++)
-            {
-                noeuds[i] = new Noeud<int>(i + 1, "blanc", listeAdjacence[i]);
-            }
-            using (StringReader sr = new StringReader("1"))                        /// Le StringReader permet d'avoir une entrée au moment de la requête "Console.ReadLine" qui solicite l'utilisateur
-            {
-                Console.SetIn(sr);
-                List<int> resultat = graphe.ParcoursEnLargeurDabord(noeuds, matrice_relation);
-                List<int> resultatFiltre = resultat.Distinct().ToList();
-                List<int> parcoursAttendu = new List<int> { 1, 2, 3, 4, 5 };
-                Assert.AreEqual(parcoursAttendu.Count, resultatFiltre.Count);
-                CollectionAssert.AreEquivalent(parcoursAttendu, resultatFiltre);
-            }
-            Console.SetIn(new StringReader("1"));
-        }
+    [TestMethod]
+    public void Test_OrdreDuGraphe()
+    {
+        int[,] matrice_relation = { { 0, 2 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 1 } };
+        Graphe<int> graphe = new Graphe<int>(matrice_relation);
+        int result = graphe.OrdreDuGraphe(matrice_relation);
+        Assert.AreEqual(4, result);
 
     }
+
+
+
+    /// <summary>
+    /// Test de la fonction GenererListeAdjacence
+    /// </summary>
+
+    [TestMethod]
+    public void Test_GenererListeAdjacence()
+    {
+        int[,] matrice_relation = { { 1, 2, 1}, { 2, 3, 0 }, { 3, 4, 1}, { 4, 5 , 1 } };  ///la matrice relation est de la forme : station départ; station arrivée; doublesens
+        int ordre = 5;
+        Graphe<int> g = new Graphe<int>(matrice_relation);
+        List<int>[] resultat = g.GenererListeAdjacence(matrice_relation, ordre);
+        Dictionary<int, List<int>> adjacenceAttendue = new Dictionary<int, List<int>>
+        {
+            { 0, new List<int> { 2 } },
+            { 1, new List<int> { 1, 3  } },
+            { 2, new List<int> { 4 } },
+            { 3, new List<int> { 3, 5 } },
+            { 4, new List<int> { 4 } }
+        };
+        foreach (var sommet in adjacenceAttendue.Keys)
+        {
+            Assert.AreEqual(adjacenceAttendue[sommet].Count, resultat[sommet].Count);
+            foreach (int voisinAttendu in adjacenceAttendue[sommet])
+            {
+                CollectionAssert.Contains(resultat[sommet], voisinAttendu);
+            }
+        }
+    }
+
+
+
+     /// <summary>
+     /// Test de la fonction GeneererMatriceAdjacence
+     /// </summary>
+
+    [TestMethod]
+    public void Test_GenererMatriceAdjacence()
+    {
+        int[,] matrice_relation = { { 1, 2, 1, 5 }, { 2, 3, 0, 2} };
+        int ordre = 3;
+        Graphe<int> graphe = new Graphe<int>(matrice_relation);
+        int infini = 9999999;
+        int[,] resultat = graphe.GenererMatriceAdjacence(matrice_relation, ordre);
+        Assert.AreEqual(0, resultat[0, 0]);
+        Assert.AreEqual(5, resultat[0, 1]);    
+        Assert.AreEqual(infini, resultat[0, 2]);
+
+        Assert.AreEqual(5, resultat[1, 0]);     
+        Assert.AreEqual(0, resultat[1, 1]);
+        Assert.AreEqual(2, resultat[1, 2]);    
+
+        Assert.AreEqual(infini, resultat[2, 0]);
+        Assert.AreEqual(infini, resultat[2, 1]);
+        Assert.AreEqual(0, resultat[2, 2]);
+    }
+
+
+
+
+
+    /// <summary>
+    /// Test de la fonction Graphe Connexe
+    /// </summary>
+
+    [TestMethod]
+    public void Test_GrapheConnexe()
+    {
+        int[,] matrice_relation = { { 1, 3 }, { 2, 3 }, { 3, 4 }, { 4, 5 }, { 5, 2 } };
+        int ordre = 5;
+        Graphe<int> g = new Graphe<int>(matrice_relation);
+        List<int> parcours = new List<int> { 1, 2, 3, 4, 5 };
+        bool resultat = g.GrapheConnexe(parcours, ordre);
+        Assert.IsTrue(resultat);
+    }
+
+
+    /// <summary>
+    /// Test de la fonction Graphe Orienté
+    /// </summary>
+
+    [TestMethod]
+    public void Test_GrapheOriente()
+    {
+                 
+        int[,] matrice_relation = { { 1, 2, 0 }, { 2, 3, 0 } };
+        int ordre = 4;
+        Graphe<int> g = new Graphe<int>(matrice_relation);
+        List<int>[] listeAdjacence = g.GenererListeAdjacence(matrice_relation, ordre);
+        bool resultat = g.GrapheOriente(listeAdjacence);
+        Assert.IsFalse(resultat);
+    }
+
+     /// <summary>
+/// Test Algorithme de Dijkstra
+/// </summary>
+
+[TestMethod]
+public void Test_AlgorithmeDijkstra()
+{
+
+    int ordre = 3;
+    int infini = 999999999;
+    int[,] matriceAdjacence = { { 0, 5, infini }, { 5, 0, 2 }, { infini, 2, 0 } };
+    int[,] matrice_relation = { { 1, 2, 1, 5 }, { 2, 3, 0, 2 } };
+
+    Graphe<int> graphe = new Graphe<int>(matrice_relation);
+
+    List<int>[] ListeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
+
+    Noeud<int>[] noeuds = new Noeud<int>[ordre];
+ 
+    noeuds[0] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[0] );
+    noeuds[1] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[1] );
+    noeuds[2] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[2] );  
+
+
+    using (StringReader sr = new StringReader("non\n1\n3\n"))
+    {
+        Console.SetIn(sr);
+        List<int> chemin = graphe.AlgorithmeDijkstra(noeuds, matriceAdjacence, ordre);
+        List<int> cheminAttendu = new List<int> { 1, 2, 3 };
+        CollectionAssert.AreEqual(cheminAttendu, chemin);
+    }
+}
+
+
+/// <summary>
+/// Test Algorithme de BellmannFord
+/// </summary>
+
+[TestMethod]
+public void Test_AlgorithmeBellmannFord()
+{
+
+    int ordre = 3;
+    int infini = 999999999;
+    int[,] matriceAdjacence = { { 0, 5, infini }, { 5, 0, 2 }, { infini, 2, 0 } };
+    int[,] matrice_relation = { { 1, 2, 1, 5 }, { 2, 3, 0, 2 } };
+
+    Graphe<int> graphe = new Graphe<int>(matrice_relation);
+
+    List<int>[] ListeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
+
+    Noeud<int>[] noeuds = new Noeud<int>[ordre];
+
+    noeuds[0] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[0]);
+    noeuds[1] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[1]);
+    noeuds[2] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[2]);
+
+
+    using (StringReader sr = new StringReader("non\n1\n3\n"))
+    {
+        Console.SetIn(sr);
+        List<int> chemin = graphe.AlgorithmeBellmanFord(noeuds, ordre,matriceAdjacence);
+        List<int> cheminAttendu = new List<int> { 1, 2, 3 };
+        CollectionAssert.AreEqual(cheminAttendu, chemin);
+    }
+}
+
+
+
+/// <summary>
+/// Test Algorithme de FloydWarshall
+/// </summary>
+
+[TestMethod]
+public void Test_AlgorithmeFloydWarshall()
+{
+
+    int ordre = 3;
+    int infini = 999999999;
+    int[,] matriceAdjacence = { { 0, 5, infini }, { 5, 0, 2 }, { infini, 2, 0 } };
+    int[,] matrice_relation = { { 1, 2, 1, 5 }, { 2, 3, 0, 2 } };
+
+    Graphe<int> graphe = new Graphe<int>(matrice_relation);
+
+    List<int>[] ListeAdjacence = graphe.GenererListeAdjacence(matrice_relation, ordre);
+
+    Noeud<int>[] noeuds = new Noeud<int>[ordre];
+
+    noeuds[0] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[0]);
+    noeuds[1] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[1]);
+    noeuds[2] = new Noeud<int>(1, "Paris", "blanc", ListeAdjacence[2]);
+
+
+    using (StringReader sr = new StringReader("non\n1\n3\n"))
+    {
+        Console.SetIn(sr);
+        List<int> chemin = graphe.AlgorithmeFloydWarshall(matriceAdjacence, ordre, noeuds);
+        List<int> cheminAttendu = new List<int> { 1, 2, 3 };
+        CollectionAssert.AreEqual(cheminAttendu, chemin);
+    }
+}
+
+
 }
