@@ -4,7 +4,7 @@ namespace ProjetPSI
 {
     public class Noeud<T>
     {
-        public T idNoeud { get; set; }
+        public T idNoeud { get; set; }             /// On écrit tous les attributs d'un Noeud
         public string nom { get; set; }
         public double longitude { get; set; }
         public double latitude { get; set; }
@@ -21,6 +21,8 @@ namespace ProjetPSI
             this.listevoisins = listevoisins ?? new List<int>();
         }
 
+
+        /// constructeur servant à la visualisation
         public Noeud(T idNoeud, string nom, double longitude, double latitude, string ligneStation, List<int> listevoisins)
         {
             this.idNoeud = idNoeud;
