@@ -186,14 +186,18 @@ namespace ProjetPSI
 }
 
 
+/// Fonction qui permet d'afficher le Sommaire de l'ensemble des stations du métro
 public void SommaireMetro(string[,] matrice_nomStation)
 {
 
-    Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");
+    Console.WriteLine("\n******Bienvenue sur le SOMMAIRE des stations de métro.*****\n**Chaque station de métro est associée à son identifiant.**");    /// Affichage pour la présentation
+    
+    /// Boucle qui permet d'afficher l'identifiant de chaque station, suivi de leur nom
     for (int i = 0; i < matrice_nomStation.GetLength(0); i++)
     {
         for (int j = 0; j < matrice_nomStation.GetLength(1); j++)
         {
+            /// Permet d'aligner les noms des stations, en fonction de la taille de l'identifiant
             if (Convert.ToInt32(matrice_nomStation[i, 0]) < 10)
             {
                 Console.Write(matrice_nomStation[i, j] + "   ");
@@ -213,10 +217,11 @@ public void SommaireMetro(string[,] matrice_nomStation)
     }
 }
 
+/// Algorithme de FloyWarshall permettant de trouver le plus court chemin entre deux stations
 public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noeud<T>[] noeuds)
 {
     List<int> PCC = new List<int>(); /// L'algorithme retournera une liste de station parcourue représentant le chemin le plus court.
-    int infini = 9999999;
+    int infini = 9999999;    /// On donne une très grande valeur qui représente l'infini
 
     Console.WriteLine("\nNous allons utiliser l'algorithme de Floyd-Warshall pour déterminer le chemin le plus court entre deux sommets.");
 
@@ -234,26 +239,29 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         SommaireMetro(matrice_nomStation); /// Lance la fonction SommaireMetro qui permet d'afficher le sommaire
     }
 
-    /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de départ et l'identifiant d'une station d'arrivée
+    /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de départ
     int depart;
     Console.WriteLine("\nSaisir le numéro de la station de départ en vous référant au sommaire : ");
     depart = Convert.ToInt32(Console.ReadLine());
     while (depart <= 0 || depart > ordre)
     {
+        /// Affiche un message d'erreur si l'identifiant de la station n'existe pas
         Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station de départ en vous référant au sommaire : ");
         depart = Convert.ToInt32(Console.ReadLine());
     }
 
+    /// On demande à l'utilisateur de rentrer l'identifiant d'une station d'une station de d'arrivée
     int arrivee;
     Console.WriteLine("\nSaisir le numéro de la station d'arrivée en vous référant au sommaire : ");
     arrivee = Convert.ToInt32(Console.ReadLine());
     while (arrivee <= 0 || arrivee > ordre)
     {
+        /// Affiche un message d'erreur si l'identifiant de la station n'existe pas
         Console.WriteLine("Le numéro saisi n'est pas correcte. Saisir le numéro de la station d'arrivee en vous référant au sommaire : ");
         arrivee = Convert.ToInt32(Console.ReadLine());
     }
 
-
+    /// On initialise les matrices des distances et des prédécesseurs
     int[,] distance = new int[ordre, ordre];
     int[,] predecesseur = new int[ordre, ordre];
 
@@ -266,20 +274,22 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
 
             if (matriceAdjacence[i,j] == infini || i==j)
             {
-                predecesseur[i, j] = -1;
+                predecesseur[i, j] = -1;    /// On donne la valeur -1 si aucun prédecesseur n'est trouvé
             } else
             {
-                predecesseur[i, j] = i;
+                predecesseur[i, j] = i;    /// Le prédécesseur intial correspond au sommet de départ
             }
         }
     }
 
-    for (int k=0; k<ordre; k++)
+    // Algorithme qui correspond au pseudo-code de Floyd-Warshall
+    for (int k=0; k<ordre; k++)    /// k correspond au sommet intermédiaire
     {
-        for (int i=0; i<ordre; i++)
+        for (int i=0; i<ordre; i++)    /// i correspond au sommet source
         {
-            for (int j=0; j<ordre; j++)
+            for (int j=0; j<ordre; j++)    /// j correspond au sommet destination
             {
+                /// Si le chemin qui passe par k est plus court, on met à jour la distance et le prédécesseur
                 if (distance[i,k] != infini && distance[k,j] != infini && distance[i,k] + distance[k,j] < distance[i,j])
                 {
                     distance[i, j] = distance[i, k] + distance[k, j];
@@ -289,15 +299,18 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         }
     }
 
+    /// On va reconstruire le PCC à partir de la matrice des prédécesseurs
     int stationActuelle = arrivee - 1;
     if (predecesseur[depart-1, arrivee-1] == -1)
     {
         Console.WriteLine("Aucun chemin n'existe pour relier ces deux stations");
     } else
     {
+        /// On remonte le chemin jusqu'à la station de départ(
         while (stationActuelle !=-1)
         {
-            PCC.Insert(0, stationActuelle + 1);
+            /// On ajoute le sommet de départ en tête de liste
+            PCC.Insert(0, stationActuelle + 1);    /// On ajoute 
             stationActuelle = predecesseur[depart - 1, stationActuelle];
         }
 
@@ -321,7 +334,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         Console.WriteLine();
     }
 
-    return PCC;
+    return PCC;  
 }
     
 
@@ -361,7 +374,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
         Console.WriteLine("Le numéro de station n'est pas valide : il faut saisir un numéro existant");          /// L'utilisateur saisi la station d'arrivée jusqu'à ce qu'elle soit valide
         arrivée = Convert.ToInt32(Console.ReadLine());
     }
-    int infini = 999999999;
+    int infini = 999999999;    /// On donne une très grande valeur qui représente l'infini
     int sommet = départ;
 
     int[] distance = new int[ordre];            /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
@@ -499,7 +512,7 @@ public List<int> AlgorithmeFloydWarshall(int[,] matriceAdjacence, int ordre, Noe
                 arrivée = Convert.ToInt32(Console.ReadLine());
             }
 
-            int infini = 999999999;
+            int infini = 999999999;    /// On donne une très grande valeur qui représente l'infini
             
 
             int[] distance = new int[ordre];               /// On initialise un tableau des distances et un tableau contenant les prédecesseurs de chaque sommet
