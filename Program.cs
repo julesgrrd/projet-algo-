@@ -98,10 +98,13 @@ namespace ProjetPSI
 
 
 
-
-
-            ///GrapheMetro.AlgorithmeFloydWarshall(MatriceAdjacence, ordre, noeuds);
-            ///GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
+            GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
+            Console.WriteLine();
+            graphe.AlgorithmeBellmanFord(noeuds, ordre, matriceAdjacence);
+            Console.WriteLine();
+            GrapheMetro.AlgorithmeFloydWarshall(MatriceAdjacence, ordre, noeuds);
+            
+            Console.ReadKey();
         }
     }
 
