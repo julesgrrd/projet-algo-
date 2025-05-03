@@ -1,0 +1,202 @@
+using Org.BouncyCastle.Asn1.Mozilla;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Projet_PSI
+{
+    internal class Graphe_CuisinierClient
+    {
+        public Dictionary<string, Noeud_CuisinierClient> Noeuds { get; set; }
+
+        public Graphe_CuisinierClient(string[,] matriceRelation_ClientCuisinier)
+        {
+            this.Noeuds = new Dictionary<string, Noeud_CuisinierClient>();
+            ConstructionGraphe(matriceRelation_ClientCuisinier);
+        }
+
+        public void ConstructionGraphe(string[,] matrice)
+        {
+            int nbLignes = matrice.GetLength(0);
+
+            for (int i = 0; i<nbLignes; i++)
+            {
+                string client = matrice[i, 0];
+                string cuisinier = matrice[i, 1];
+
+                if (Noeuds.ContainsKey(client)==false)
+                {
+                    Noeuds[client] = new Noeud_CuisinierClient(client);
+                }
+                
+                if (Noeuds.ContainsKey(cuisinier)==false)
+                {
+                    Noeuds[cuisinier] = new Noeud_CuisinierClient(cuisinier);
+                }
+
+                if (Noeuds[client].voisins.Contains(cuisinier)==false)
+                {
+                    Noeuds[client].voisins.Add(cuisinier);
+                }
+
+                if (Noeuds[cuisinier].voisins.Contains(client)==false)
+                {
+                    Noeuds[cuisinier].voisins.Add(client);
+                }
+            }
+        }
+
+        public List<Noeud_CuisinierClient> SommetsOrdreDecroissant (Dictionary<string, Noeud_CuisinierClient> Noeuds)
+        {
+            List<Noeud_CuisinierClient> listeSommetsOrdreDec = new List<Noeud_CuisinierClient>();
+            
+            foreach (var noeud in Noeuds)
+            {
+                listeSommetsOrdreDec.Add(noeud.Value);
+            }
+
+            for (int i=0; i<listeSommetsOrdreDec.Count-1; i++)
+            {
+                for (int j=i; j<listeSommetsOrdreDec.Count; j++)
+                {
+                    if (listeSommetsOrdreDec[j].voisins.Count > listeSommetsOrdreDec[i].voisins.Count)
+                    {
+                        var memoire = listeSommetsOrdreDec[i];
+                        listeSommetsOrdreDec[i] = listeSommetsOrdreDec[j];
+                        listeSommetsOrdreDec[j] = memoire;
+                    }
+                }
+            }
+
+            return listeSommetsOrdreDec;
+        }
+        public void Algo_WelshPowell(Graphe_CuisinierClient graphe)
+        {
+            List<Noeud_CuisinierClient> OrdreDec = SommetsOrdreDecroissant(graphe.Noeuds);
+            
+            int couleur_courante = 0;
+
+            while (OrdreDec.Count > 0)
+            {
+                couleur_courante++;
+
+                Noeud_CuisinierClient x = OrdreDec[0];
+                x.couleur = couleur_courante;
+                List<string> listeVoisins = new List<string>(x.voisins);
+                OrdreDec.RemoveAt(0);
+
+                List<Noeud_CuisinierClient> noeudsColories = new List<Noeud_CuisinierClient>();
+
+                foreach (var noeud in OrdreDec)
+                {
+                    if (noeud.couleur==-1 && listeVoisins.Contains(noeud.id)==false)
+                    {
+                        bool peutEtreColorie = true;
+
+                        foreach(string idVoisin in noeud.voisins)
+                        {
+                            if (graphe.Noeuds[idVoisin].couleur == couleur_courante)
+                            {
+                                peutEtreColorie=false;
+                                break;
+                            }
+                        }
+
+                        if (peutEtreColorie == true)
+                        {
+                            noeud.couleur = couleur_courante;
+                            noeudsColories.Add(noeud);
+                            listeVoisins.AddRange(noeud.voisins);
+                        }
+
+                    }
+                }
+
+                foreach (var noeud in noeudsColories)
+                {
+                    OrdreDec.Remove(noeud);
+                }
+            }
+            
+        }
+
+        public void AfficherColorationNoeud ()
+        {
+            Console.WriteLine("\nLa coloration finale du graphe, faites à l'aide de l'algorithme de Welsh-Powell, est : ");
+
+            foreach (var noeud in Noeuds.Values)
+            {
+                Console.WriteLine(noeud.id + " -> couleur numéro : " + noeud.couleur);
+            }
+        }
+
+        public int NombreMinCouleurs()
+        {
+            int couleurMax = -1;
+
+            foreach (var noeud in Noeuds.Values)
+            {
+                if (noeud.couleur > couleurMax)
+                {
+                    couleurMax = noeud.couleur;
+                }
+            }
+
+            Console.WriteLine("\nLe nombre minimal de couleurs nécessaires pour colorier le graphe (nombre chromatique) est de : " + couleurMax+"\n");
+
+            return couleurMax;
+        }
+
+        public void GrapheBiparti(int couleurMax)
+        {
+            if (couleurMax<=2)
+            {
+                Console.WriteLine("\nLe graphe est biparti car son nombre chromatique est inférieur ou égale à 2.\n");
+            } else {
+                Console.WriteLine("\nLe graphe n'est pas biparti car son nombre chromatique est strictement supérieur à 2.\n");
+            }
+        }
+
+        public void GraphePlanaire(int couleurMax)
+        {
+            if (couleurMax<=4)
+            {
+                Console.WriteLine("\nLe graphe peut-être planaire car son nombre chromatique est inférieur ou égal à 4, donc il respecte le Four Color Theorem.\n");
+            } else
+            {
+                Console.WriteLine("\nLe graphe n'est pas planaire car son nombre chromatique est strictement supérieur à 4, donc il ne respecte pas le FOur Color Theroem.\n");
+            }
+        }
+
+        public void GroupeIndependant(int couleurMax)
+        {
+            Console.WriteLine("\nLes groupes indépendants, déterminés grâce à la coloration, sont : ");
+
+            for (int i=1; i<=couleurMax; i++)
+            {
+                List<string> groupeIndependant = new List<string>();
+
+                foreach (var noeud in Noeuds.Values)
+                {
+                    if (noeud.couleur==i)
+                    {
+                        groupeIndependant.Add(noeud.id);
+                    }
+                }
+
+                Console.WriteLine("Couleur numéro " + i + " : ");
+                foreach (string id in groupeIndependant)
+                {
+                    Console.Write(id + " ; ");
+                }
+                Console.WriteLine();
+            }
+        }
+
+    }
+
+}
