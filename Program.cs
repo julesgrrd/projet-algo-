@@ -10,11 +10,15 @@ namespace ProjetPSI
     using System.Runtime.CompilerServices;
     using ProjetPSI;
     using SkiaSharp;
+    using PartieSQL;
+    using Projet_PSI;
 
     public class Program
     {
         static void Main(string[] args)
         {
+            /// ****************************************************PARTIE GRAPHE METRO PARIS************************************************************** 
+            
             string fichier = "..\\net7.0\\MetroParis.xlsx";                /// On accède au fichier excel MetroParis contenant tous les liens du graphe
             int[,] matrice_relation = null;                             /// On initalise deux matrices que nous utiliserons par la suite
             string[,] matrice_infoStation = null;
@@ -77,13 +81,13 @@ namespace ProjetPSI
             Graphe<int> GrapheMetro = new Graphe<int>(matrice_relation, matrice_infoStation); /// On crée un graphe GrapheMetro à partir de la classe Graphe
 
             int ordre = GrapheMetro.OrdreDuGraphe(matrice_relation);    /// On appelle la fonction OrdreDuGraphe pour obtenir l'ordre du graphe
-            int taille = GrapheMetro.TailleDuGraphe(matrice_relation);    /// On appelle la fonction TailleDuGraphe pour obtenir la taille du graphe
+            /// int taille = GrapheMetro.TailleDuGraphe(matrice_relation);    /// On appelle la fonction TailleDuGraphe pour obtenir la taille du graphe
             List<int>[] ListeAdjacence = GrapheMetro.GenererListeAdjacence(matrice_relation, ordre);    /// On appelle la fonction ListeAdjacence pour obtenir la liste d'adjacence du graphe
-            bool orienté = GrapheMetro.GrapheOriente(ListeAdjacence);    /// On appelle la fonction GrapheOriente pour savoir si c'est orienté
+            /// bool orienté = GrapheMetro.GrapheOriente(ListeAdjacence);    /// On appelle la fonction GrapheOriente pour savoir si c'est orienté
             int[,] MatriceAdjacence = GrapheMetro.GenererMatriceAdjacence(matrice_relation, ordre);    /// On appelle la fonction MatriceAdjacence pour obtenir la matrice d'adjacence du graphe
 
-            GrapheMetro.SommaireMetro(matrice_infoStation);    /// On appelle la fonction SommaireMetro qui permet d'afficher le sommaire des stations de métro avec leur identifant et nom
-
+            /// GrapheMetro.SommaireMetro(matrice_infoStation);    /// On appelle la fonction SommaireMetro qui permet d'afficher le sommaire des stations de métro avec leur identifant et nom
+            
 
             /// On initialise un tableau de noeuds noeudsVisuel qui servira pour la visualisation du plan de métro
             Noeud<int>[] noeudsVisuel = new Noeud<int>[ordre];
@@ -123,6 +127,7 @@ namespace ProjetPSI
                 noeuds[i] = new Noeud<int>(i + 1, nom, "blanc", ListeAdjacence[i]);    /// Tous les noeuds de graphe prennent en paramètre un identifiant i+1, la couleur blanche et une liste de voisins correspondant à la liste d'adjacence du sommet étudié.
             }
 
+            /*
             Console.WriteLine();
             var PCC = GrapheMetro.AlgorithmeDijkstra(noeuds, MatriceAdjacence, ordre);
             Console.WriteLine();
@@ -134,8 +139,61 @@ namespace ProjetPSI
 
             Visuel visuel = new Visuel(noeudsVisuel, matrice_relation);    /// On crée un visuel à partir de la classe Visuel
             visuel.GenererCarteAvecChemin("PlanMetro.png", PCC);    /// On appelle la fonction GenererCarteAvecChemin qui affichera une image représentant le plan du métro avec le PCC entre deux stations
+            */
 
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            ///
+            /// **************************************************************PARTIE GRAPHE RELATION CLIENT-CUISINIER******************************************************************
+            string[,] matriceRelation_ClientCuisinier = RelationClientCuisinier.MatriceClientCuisinier();
+            
+            for (int i=0; i<matriceRelation_ClientCuisinier.GetLength(0); i++)
+            {
+                for (int j=0; j<matriceRelation_ClientCuisinier.GetLength(1); j++)
+                {
+                    Console.Write(matriceRelation_ClientCuisinier[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
 
+            /// On crée notre graphe avec les relations entre clients et cuisiniers
+            Graphe_CuisinierClient graphe_RelationCuisinierClient = new Graphe_CuisinierClient(matriceRelation_ClientCuisinier);
+
+            /// On applique l'algorithme de coloration Welsh-Powells sur le graphe
+            graphe_RelationCuisinierClient.Algo_WelshPowell(graphe_RelationCuisinierClient);
+
+            /// On affiche la coloration du graphe
+            graphe_RelationCuisinierClient.AfficherColorationNoeud();
+
+            /// On obtient le nombre chromatique du graphe
+            int nbChromatique = graphe_RelationCuisinierClient.NombreMinCouleurs();
+
+            /// On vérifie si le graphe est biparti ou non
+            graphe_RelationCuisinierClient.GrapheBiparti(nbChromatique);
+
+            /// On vérifie si le graphe est planaire ou non
+            graphe_RelationCuisinierClient.GraphePlanaire(nbChromatique);
+
+            /// On affiche les différents groupes indépendants du graphe
+            graphe_RelationCuisinierClient.GroupeIndependant(nbChromatique);
         }
     }
 
