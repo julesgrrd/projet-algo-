@@ -1,0 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Projet_PSI
+{
+    public class Noeud_CuisinierClient
+    {
+        public string id { get; set; }
+        public List<string> voisins { get; set; }
+        public int couleur { get; set; } = -1; /// -1 pour dire que ce n'est pas colorié
+
+        public Noeud_CuisinierClient(string id)
+        {
+            this.id = id;
+            this.voisins = new List<string>();
+        }
+    }
+}
