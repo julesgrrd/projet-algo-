@@ -9,16 +9,21 @@ using System.Threading.Tasks;
 
 namespace Projet_PSI
 {
-    internal class Graphe_CuisinierClient
+    public class Graphe_CuisinierClient
     {
-        public Dictionary<string, Noeud_CuisinierClient> Noeuds { get; set; }
+        public Dictionary<string, Noeud_CuisinierClient> Noeuds { get; set; } /// Dictionnaire Noeuds qui contient les noeuds du graphe qui sont identifiés par leur identifiant
 
+        /// Constructeur avec le dictionaire Noeud, et qui construit le graphe à partir d'une matrice de string, qui regroupe les relations entre cuisiniers et clients
         public Graphe_CuisinierClient(string[,] matriceRelation_ClientCuisinier)
         {
             this.Noeuds = new Dictionary<string, Noeud_CuisinierClient>();
             ConstructionGraphe(matriceRelation_ClientCuisinier);
         }
 
+        /// <summary>
+        /// Méthode permettant de construire un graphe à partir d'une matrice de string, qui regroupe les relations entre cuisiniers et clients
+        /// </summary>
+        /// <param name="matrice"></param>
         public void ConstructionGraphe(string[,] matrice)
         {
             int nbLignes = matrice.GetLength(0);
@@ -28,21 +33,25 @@ namespace Projet_PSI
                 string client = matrice[i, 0];
                 string cuisinier = matrice[i, 1];
 
+                /// On crée un noeud pour le client, s'il n'existe pas encore
                 if (Noeuds.ContainsKey(client)==false)
                 {
                     Noeuds[client] = new Noeud_CuisinierClient(client);
                 }
                 
+                /// On crée un noeud pour le cuisinier, s'il n'existe pas encore
                 if (Noeuds.ContainsKey(cuisinier)==false)
                 {
                     Noeuds[cuisinier] = new Noeud_CuisinierClient(cuisinier);
                 }
 
+                /// On ajoute le cuisinier dans la liste des voisins du client s'il n'est pas encore présent
                 if (Noeuds[client].voisins.Contains(cuisinier)==false)
                 {
                     Noeuds[client].voisins.Add(cuisinier);
                 }
 
+                /// On ajoute le client dans la liste des voisins du cuisinier s'il n'est pas encore présent
                 if (Noeuds[cuisinier].voisins.Contains(client)==false)
                 {
                     Noeuds[cuisinier].voisins.Add(client);
@@ -50,20 +59,28 @@ namespace Projet_PSI
             }
         }
 
+
+        /// <summary>
+        /// Méthode qui permet de trier la liste des noeuds, par ordre décroissant de degré
+        /// </summary>
+        /// <param name="Noeuds"></param>
+        /// <returns></returns>
         public List<Noeud_CuisinierClient> SommetsOrdreDecroissant (Dictionary<string, Noeud_CuisinierClient> Noeuds)
         {
             List<Noeud_CuisinierClient> listeSommetsOrdreDec = new List<Noeud_CuisinierClient>();
             
+            /// On ajoute tous les noeuds dans une liste
             foreach (var noeud in Noeuds)
             {
                 listeSommetsOrdreDec.Add(noeud.Value);
             }
 
+            /// Méthode du tri à bulles 
             for (int i=0; i<listeSommetsOrdreDec.Count-1; i++)
             {
                 for (int j=i; j<listeSommetsOrdreDec.Count; j++)
                 {
-                    if (listeSommetsOrdreDec[j].voisins.Count > listeSommetsOrdreDec[i].voisins.Count)
+                    if (listeSommetsOrdreDec[j].voisins.Count > listeSommetsOrdreDec[i].voisins.Count) /// Si le nombre de voisins (degré) d'un noeud est plus grand que le noeud qui le précède, on échange leur place
                     {
                         var memoire = listeSommetsOrdreDec[i];
                         listeSommetsOrdreDec[i] = listeSommetsOrdreDec[j];
@@ -74,6 +91,12 @@ namespace Projet_PSI
 
             return listeSommetsOrdreDec;
         }
+
+
+        /// <summary>
+        /// Méthode de la coloration du graphe par WelshPowell
+        /// </summary>
+        /// <param name="graphe"></param>
         public void Algo_WelshPowell(Graphe_CuisinierClient graphe)
         {
             List<Noeud_CuisinierClient> OrdreDec = SommetsOrdreDecroissant(graphe.Noeuds);
@@ -84,29 +107,29 @@ namespace Projet_PSI
             {
                 couleur_courante++;
 
-                Noeud_CuisinierClient x = OrdreDec[0];
+                Noeud_CuisinierClient x = OrdreDec[0];  ///Le noeud étudié correspond au premier noeud de la liste (celui avec le degré le plus élevé)
                 x.couleur = couleur_courante;
                 List<string> listeVoisins = new List<string>(x.voisins);
                 OrdreDec.RemoveAt(0);
 
-                List<Noeud_CuisinierClient> noeudsColories = new List<Noeud_CuisinierClient>();
+                List<Noeud_CuisinierClient> noeudsColories = new List<Noeud_CuisinierClient>(); /// On crée une liste qui permet de connaitre les noeuds qui sont coloriés
 
                 foreach (var noeud in OrdreDec)
                 {
-                    if (noeud.couleur==-1 && listeVoisins.Contains(noeud.id)==false)
+                    if (noeud.couleur==-1 && listeVoisins.Contains(noeud.id)==false)    /// Vérifie si on peut colorier le noeud (il n'est pas colorié et il n'est pas voisin avec x) 
                     {
                         bool peutEtreColorie = true;
 
                         foreach(string idVoisin in noeud.voisins)
                         {
-                            if (graphe.Noeuds[idVoisin].couleur == couleur_courante)
+                            if (graphe.Noeuds[idVoisin].couleur == couleur_courante)    /// ON vérifie qu'aucun noeud voisin au noeud est colorié de la couleur courante
                             {
                                 peutEtreColorie=false;
                                 break;
                             }
                         }
 
-                        if (peutEtreColorie == true)
+                        if (peutEtreColorie == true)    /// On colore le noeud si toutes les conditions sont vérifiées
                         {
                             noeud.couleur = couleur_courante;
                             noeudsColories.Add(noeud);
@@ -116,7 +139,7 @@ namespace Projet_PSI
                     }
                 }
 
-                foreach (var noeud in noeudsColories)
+                foreach (var noeud in noeudsColories)   /// ON enlève les noeuds coloriés de la liste de départ
                 {
                     OrdreDec.Remove(noeud);
                 }
@@ -124,6 +147,9 @@ namespace Projet_PSI
             
         }
 
+        /// <summary>
+        /// Méthode qui permet d'afficher la coloration du graphe
+        /// </summary>
         public void AfficherColorationNoeud ()
         {
             Console.WriteLine("\nLa coloration finale du graphe, faites à l'aide de l'algorithme de Welsh-Powell, est : ");
@@ -134,13 +160,18 @@ namespace Projet_PSI
             }
         }
 
+
+        /// <summary>
+        /// Méthode qui permet de retourner le nombre chromatique du graphe (nombre de couleur qui sont utilisées pour la coloration)
+        /// </summary>
+        /// <returns></returns>
         public int NombreMinCouleurs()
         {
             int couleurMax = -1;
 
             foreach (var noeud in Noeuds.Values)
             {
-                if (noeud.couleur > couleurMax)
+                if (noeud.couleur > couleurMax) /// Echange la couleur maximale si la couleur actuelle est plus grande
                 {
                     couleurMax = noeud.couleur;
                 }
@@ -151,43 +182,69 @@ namespace Projet_PSI
             return couleurMax;
         }
 
-        public void GrapheBiparti(int couleurMax)
+
+        /// <summary>
+        /// Méthode qui permet de savoir si un graphe est biparti à partir de son nombre chromatique
+        /// </summary>
+        /// <param name="couleurMax"></param>
+        /// <returns></returns>
+        public bool GrapheBiparti(int couleurMax)
         {
-            if (couleurMax<=2)
+            bool biparti = false;
+            if (couleurMax<=2)  /// Dans le cours, si le nombre chromatique d'un graphe est inférieur ou égale à 2, alors il est biparti
             {
                 Console.WriteLine("\nLe graphe est biparti car son nombre chromatique est inférieur ou égale à 2.\n");
+                biparti = true;
             } else {
                 Console.WriteLine("\nLe graphe n'est pas biparti car son nombre chromatique est strictement supérieur à 2.\n");
             }
+
+            return biparti;
         }
 
-        public void GraphePlanaire(int couleurMax)
+
+        /// <summary>
+        /// Méthode qui permet de savoir si un graphe est planaire à partir de son nombre chromatique
+        /// </summary>
+        /// <param name="couleurMax"></param>
+        /// <returns></returns>
+        public bool GraphePlanaire(int couleurMax)
         {
-            if (couleurMax<=4)
+            bool planaire = false;
+            if (couleurMax<=4)  /// Il est demandé de savoir si un graphe est planaire à partir de la coloration. D'après le cours, la coloration permet seulement de savoir si un graphe PEUT être planaire. C'est le cas si son nombre chromatique est inférieur ou égale à 4
             {
                 Console.WriteLine("\nLe graphe peut-être planaire car son nombre chromatique est inférieur ou égal à 4, donc il respecte le Four Color Theorem.\n");
+                planaire = true;
             } else
             {
                 Console.WriteLine("\nLe graphe n'est pas planaire car son nombre chromatique est strictement supérieur à 4, donc il ne respecte pas le FOur Color Theroem.\n");
             }
+
+            return planaire;
         }
 
+
+        /// <summary>
+        /// Méthode qui permet de connaitre les différents groupes indépendants du graphe, à partir de son nombre chromatique. En effet, les groupes indépendants sont composés par les noeuds de même couleur
+        /// </summary>
+        /// <param name="couleurMax"></param>
         public void GroupeIndependant(int couleurMax)
         {
             Console.WriteLine("\nLes groupes indépendants, déterminés grâce à la coloration, sont : ");
-
+            List<string> ordreGroupe = new List<string>(); /// Cette liste n'est pas utile dans la méthode. Elle permet de vérifier les tests unitaires.
             for (int i=1; i<=couleurMax; i++)
             {
-                List<string> groupeIndependant = new List<string>();
+                List<string> groupeIndependant = new List<string>();    /// On crée une liste de string à chaque nouvelle couleur étudiée
 
                 foreach (var noeud in Noeuds.Values)
                 {
                     if (noeud.couleur==i)
                     {
-                        groupeIndependant.Add(noeud.id);
+                        groupeIndependant.Add(noeud.id);    /// Si le noeud est de la mêle couleur que celle étudiée, on rajoute le noeud dans la liste
                     }
                 }
 
+                /// On affiche le groupe indépendant
                 Console.WriteLine("Couleur numéro " + i + " : ");
                 foreach (string id in groupeIndependant)
                 {
