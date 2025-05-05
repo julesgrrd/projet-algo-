@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Projet_PSI;
 using System.Collections.Generic;
 using System.Configuration;
 
@@ -145,7 +146,7 @@ namespace ProjetPSI
             using (StringReader sr = new StringReader("non\n1\n3\n"))
             {
                 Console.SetIn(sr);
-                List<int> chemin = graphe.AlgorithmeDijkstra(noeuds, matriceAdjacence, ordre);
+                List<int> chemin = graphe.AlgorithmeDijkstra(noeuds, matriceAdjacence, ordre, 1, 3);
                 List<int> cheminAttendu = new List<int> { 1, 2, 3 };
                 CollectionAssert.AreEqual(cheminAttendu, chemin);
             }
@@ -180,7 +181,7 @@ namespace ProjetPSI
             using (StringReader sr = new StringReader("non\n1\n3\n"))
             {
                 Console.SetIn(sr);
-                List<int> chemin = graphe.AlgorithmeBellmanFord(noeuds, ordre, matriceAdjacence);
+                List<int> chemin = graphe.AlgorithmeBellmanFord(noeuds, ordre, matriceAdjacence, 1, 3);
                 List<int> cheminAttendu = new List<int> { 1, 2, 3 };
                 CollectionAssert.AreEqual(cheminAttendu, chemin);
             }
@@ -216,12 +217,120 @@ namespace ProjetPSI
             using (StringReader sr = new StringReader("non\n1\n3\n"))
             {
                 Console.SetIn(sr);
-                List<int> chemin = graphe.AlgorithmeFloydWarshall(matriceAdjacence, ordre, noeuds);
+                List<int> chemin = graphe.AlgorithmeFloydWarshall(matriceAdjacence, ordre, noeuds, 1, 3);
                 List<int> cheminAttendu = new List<int> { 1, 2, 3 };
                 CollectionAssert.AreEqual(cheminAttendu, chemin);
             }
         }
 
+        ///Tests unitaires des méthodes de la classe Graphe_CuisinierClient
+        
+
+        /// <summary>
+        /// Test de la méthode ConstructionGraphe
+        /// </summary>
+        [TestMethod]
+        public void Test_ConstructionGraphe()
+        {
+            string[,] matrice_relation = { { "CLI001", "CUI001" }, { "CLI002", "CUI001" }, { "CLI003", "CUI002" }, { "CLI002", "CUI002" } };
+            Graphe_CuisinierClient graphe = new Graphe_CuisinierClient(matrice_relation);
+
+            Assert.IsTrue(graphe.Noeuds.ContainsKey("CLI001"));
+            Assert.IsTrue(graphe.Noeuds.ContainsKey("CLI002"));
+            Assert.IsTrue(graphe.Noeuds.ContainsKey("CLI003"));
+
+            Assert.AreEqual(2, graphe.Noeuds["CUI002"].voisins.Count);
+            Assert.AreEqual(1, graphe.Noeuds["CLI001"].voisins.Count);
+        }
+
+
+        /// <summary>
+        /// Test de la méthode Test_SommetsOrdreDecroissant
+        /// </summary>
+        [TestMethod]
+        public void Test_SommetsOrdreDecroissant()
+        {
+            string[,] matrice_relation = { { "CLI001", "CUI001" }, { "CLI002", "CUI001" }, { "CLI003", "CUI002" }, { "CLI002", "CUI002" } };
+            Graphe_CuisinierClient graphe = new Graphe_CuisinierClient(matrice_relation);
+
+            List<Noeud_CuisinierClient> tri = graphe.SommetsOrdreDecroissant(graphe.Noeuds);
+
+            for (int i=1; i<tri.Count; i++)
+            {
+                Assert.IsTrue(tri[i - 1].voisins.Count >= tri[i].voisins.Count);
+            }
+        }
+
+
+        /// <summary>
+        /// Test de la méthode Test_AlgoWelshPowell
+        /// </summary>
+        [TestMethod]
+        public void Test_AlgoWelshPowell()
+        {
+            string[,] matrice_relation = { { "CLI001", "CUI001" }, { "CLI002", "CUI001" }, { "CLI003", "CUI002" }, { "CLI002", "CUI002" } };
+            Graphe_CuisinierClient graphe = new Graphe_CuisinierClient(matrice_relation);
+
+            graphe.Algo_WelshPowell(graphe);
+
+            foreach (Noeud_CuisinierClient noeud in graphe.Noeuds.Values)
+            {
+                foreach (var idVoisin in noeud.voisins)
+                {
+                    var voisin = graphe.Noeuds[idVoisin];
+                    Assert.AreNotEqual(noeud.couleur, voisin.couleur);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Test de la méthode NombreMinCouleur
+        /// </summary>
+        [TestMethod]
+        public void Test_NombreMinCouleur()
+        {
+            string[,] matrice_relation = { { "CLI001", "CUI001" }, { "CLI002", "CUI001" }, { "CLI003", "CUI002" }, { "CLI002", "CUI002" } };
+            Graphe_CuisinierClient graphe = new Graphe_CuisinierClient(matrice_relation);
+            graphe.Algo_WelshPowell(graphe);
+
+            int nbChromatique = graphe.NombreMinCouleurs();
+
+            Assert.AreEqual(nbChromatique,2);
+        }
+
+        /// <summary>
+        /// Test de la méthode GrapheBiparti
+        /// </summary>
+        [TestMethod]
+        public void Test_GrapheBiparti()
+        {
+            string[,] matrice_relation = { { "CLI001", "CUI001" }, { "CLI002", "CUI001" }, { "CLI003", "CUI002" }, { "CLI002", "CUI002" } };
+            Graphe_CuisinierClient graphe = new Graphe_CuisinierClient(matrice_relation);
+            graphe.Algo_WelshPowell(graphe);
+            int nbChromatique = graphe.NombreMinCouleurs();
+
+            bool biparti = graphe.GrapheBiparti(nbChromatique);
+
+            Assert.AreEqual(biparti, true);
+        }
+
+
+        /// <summary>
+        /// Test de la méthode GraphePlanaire
+        /// </summary>
+        [TestMethod]
+        public void Test_GraphePlanaire()
+        {
+            string[,] matrice_relation = { { "CLI001", "CUI001" }, { "CLI002", "CUI001" }, { "CLI003", "CUI002" }, { "CLI002", "CUI002" } };
+            Graphe_CuisinierClient graphe = new Graphe_CuisinierClient(matrice_relation);
+            graphe.Algo_WelshPowell(graphe);
+            int nbChromatique = graphe.NombreMinCouleurs();
+
+            bool planaire = graphe.GraphePlanaire(nbChromatique);
+
+            Assert.AreEqual(planaire, true);
+        }
 
     }
 }
