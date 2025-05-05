@@ -1,0 +1,51 @@
+using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ProjetPSI
+{
+    public class RelationClientCuisinier { 
+
+        /// <summary>
+        /// Méthode qui renvoie une matrice de string, avec en colonne de gauche les clients et en colonne de droite les cuisiniers à qui ils ont passé commande
+        /// </summary>
+        /// <returns></returns>
+        public static string[,] MatriceClientCuisinier()
+        {
+            List<string[]>lignes = new List<string[]>();
+            string reqRoot = "SERVER=localhost;PORT=3306;DATABASE=datatables;UID=admin;PASSWORD=admin_password";    /// Chaine de connexion vers la BDD MySQL CréationTables
+            using (MySqlConnection connex = new MySqlConnection(reqRoot)) /// Permet de se connecter à la base
+            {
+                connex.Open();
+                string requete = "SELECT DISTINCT idClient, idCuisinier FROM CommandeTransactions"; /// Requête SQL qui permet de sélectionner l'id du client et l'id du cuisinier d'une même commande
+                using (MySqlCommand commande = new MySqlCommand(requete, connex))
+                {
+                    using (MySqlDataReader lecture = commande.ExecuteReader())  /// Va permettre de lire les résultats de la requête
+                    {
+                        while (lecture.Read())
+                        {
+                            string idCLient = lecture["idClient"].ToString();   /// On récupère l'idClient de la commande
+                            string idCuisinier = lecture["idCuisinier"].ToString(); /// On récupère l'idCuisinier de la commande
+                            lignes.Add(new string[] { idCLient, idCuisinier });
+                        }
+
+                        int nbLignes = lignes.Count;
+                        string[,] matrice_relation = new string[nbLignes, 2];
+
+                        /// On remplit la matrice avec les données lues
+                        for (int i = 0; i < nbLignes; i++)
+                        {
+                            matrice_relation[i, 0] = lignes[i][0];
+                            matrice_relation[i, 1] = lignes[i][1];
+                        }
+
+                        return matrice_relation;
+                    }
+                }
+            }
+        }
+    }
+}
