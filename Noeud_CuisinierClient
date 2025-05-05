@@ -8,10 +8,11 @@ namespace Projet_PSI
 {
     public class Noeud_CuisinierClient
     {
-        public string id { get; set; }
-        public List<string> voisins { get; set; }
+        public string id { get; set; } /// id du noeud
+        public List<string> voisins { get; set; } /// liste des voisins du noeud
         public int couleur { get; set; } = -1; /// -1 pour dire que ce n'est pas colorié
 
+        ///Constructeur avec l'id et la liste des voisins du noeud
         public Noeud_CuisinierClient(string id)
         {
             this.id = id;
