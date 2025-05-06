@@ -1,0 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Projet_PSI
+{
+    public class Commande                /// On crée une classe commande avec les attributs ci-dessous nécessaire à l'import/export xml/Json qui à besoin de lignes de commandes
+    {
+
+            public string IdCommande { get; set; }
+            public string IdClient { get; set; }
+            public string IdCuisinier { get; set; }
+            public DateTime DateCommande { get; set; }
+        
+    }
+}
