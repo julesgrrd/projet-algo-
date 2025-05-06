@@ -1,0 +1,90 @@
+using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+
+namespace Projet_PSI
+{
+    public class ImportExport_XML_Json
+    {
+        public readonly string _connectionString;
+
+        public ImportExport_XML_Json(string connectionString)
+        {
+            _connectionString = connectionString;                                /// On se connecte à notre base de donnée grâce au lien de connection
+        }
+
+        public List<Commande> RécupérerCommande()
+        {
+            var commandes = new List<Commande>();                       /// On crée une liste de commandes
+
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                connection.Open();                                                     /// On ouvre la connection
+                var query = "SELECT idCommande, idClient, idCuisinier, DateCommande FROM CommandeTransactions";              /// On extrait les données : idClient, idCommande, idCuisinier, DateCommande qui caractérisent une commande
+
+                using (var command = new MySqlCommand(query, connection))                 /// En utilisant cette requête, 
+                using (var reader = command.ExecuteReader())                        /// Ainsi que l'outil reader qui permet de lire le résultat issu de la requête,
+                {
+                    while (reader.Read())
+                    {
+                        commandes.Add(new Commande                           /// On ajoute une commande à la liste pour chaque commande lu par la requête et on lui donne les attributs ainsi lu
+                        {
+                            IdCommande = reader.GetString(0),
+                            IdClient = reader.GetString(1),
+                            IdCuisinier = reader.GetString(2),
+                            DateCommande = reader.GetDateTime(3)
+                        });
+                    }
+                }
+            }
+
+            return commandes;
+        }
+
+        public void ExportVersJson(string filePath)
+        {
+            var commandes = RécupérerCommande();                              /// On récupère toutes les commandes crées plus haut
+            var json = JsonSerializer.Serialize(commandes, new JsonSerializerOptions { WriteIndented = true });                  /// On transforme notre liste de commande en format Json et on y applique l'indentation et le format d'écriture Json
+            File.WriteAllText(filePath, json);
+        }
+
+        public void ExportVersXml(string filePath)
+        {
+            var commandes = RécupérerCommande();                                    /// De même, on récupère les commandes importées de la base de données
+            var serializer = new XmlSerializer(typeof(List<Commande>));             /// On crée l'outil qui va transformer nos commandes en format xml en lui précisant qu'il devra s'occuper d'un type "liste de commandes"
+            using var writer = new StreamWriter(filePath, false);                  /// Cette commande permet de remplacer le fichier par le nouveau qui va être crée si il existe déjà un fichier. Cela empêche des erreurs liées à un fichier déjà existant qui empêche la création du nouveau.
+            serializer.Serialize(writer, commandes);                               /// On transforme donc notre liste de commandes en format xml
+        }
+
+
+
+        public List<Commande> ImportDepuisJson(string filePath)                 /// Méthode pour transformer un format Json et retourner une liste de commande
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine("Aucun fichier Json n'a été trouvé.");
+            }
+
+            var json = File.ReadAllText(filePath);                                           /// On lit le fichier Json existant
+            return JsonSerializer.Deserialize<List<Commande>>(json);                         /// On transforme les commandes Json en listes de commande 
+        }
+
+        public List<Commande> ImportDepuisXml(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine("Aucun fichier Xml n'a été trouvé.");
+            }
+
+            var serializer = new XmlSerializer(typeof(List<Commande>));                   /// De même que dans la méthode d'importation, on crée l'outil qui nous seras utile
+            using var reader = new StreamReader(filePath); 
+            return (List<Commande>)serializer.Deserialize(reader);                        /// Une liste de commandes est renvoyée
+        }
+
+    }
+}
