@@ -1,0 +1,322 @@
+using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+
+
+namespace Projet_PSI
+
+{
+    internal class Statistiques
+    {
+        private readonly string _connectionString;
+
+        public Statistiques(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        /// <summary>
+        /// Nombre de livraisons effectuées par cuisinier
+        /// </summary>
+
+        public void NombreLivraisonsParCuisinier()
+        {
+            using var connection = new MySqlConnection(_connectionString);           /// On ouvre une connexion à partie du lien dans la parenthèse (il s'agit d'une connexion administrateur cf. l'appel dans la classe program.cs)
+            connection.Open();
+
+            /// On crée une commande MySQL car on travaille sur MySQL WorkBench : on compte le nombre de livraisons par cuisiniers
+            var cmd = new MySqlCommand(@"
+            SELECT idCuisinier, COUNT(*) AS NombreLivraisons
+            FROM CommandeTransactions
+            GROUP BY idCuisinier;
+            ", connection);
+
+            Console.WriteLine("\n Nombre de livraisons effectuées par cuisinier : ");
+            using var reader = cmd.ExecuteReader();                       /// On lit la réponse tirée de la requête SQL puis on l'affiche ci dessous
+            while (reader.Read())
+            {
+                Console.WriteLine("Cuisinier" + reader["idCuisinier"] + " - " + reader["NombreLivraisons"] + " livraisons");
+            }
+
+        }
+
+
+        /// <summary>
+        /// Commandes effectuées selon une période de temps
+        /// </summary>
+        /// <param name="debut"></param>
+        /// <param name="fin"></param>
+        public void CommandeSelonPeriode(DateTime debut, DateTime fin)
+        {
+            Console.WriteLine("\n Commandes effectuées selon une période de temps : ");
+            Console.WriteLine("Dans notre base de données, les commandes ont été réalisées du 2025/03/05 au 2025/03/12 ");
+            Console.WriteLine("\n Saisir la date de début de la période (format année/mois/jours) : ");
+            debut = Convert.ToDateTime(Console.ReadLine());
+            Console.WriteLine("Saisir la date de fin de la période (format année/mois/jours) : ");
+            fin = Convert.ToDateTime(Console.ReadLine());                           /// On demande à l'utilisateur de saisir les dates de début et de fin
+
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+
+            var cmd = new MySqlCommand(@"                           
+            SELECT * FROM CommandeTransactions
+            WHERE dateCommande BETWEEN @debut AND @fin;
+        ", connection);                                              /// On sélectionne toutes les commandes entre la date de début et la date de fin
+            cmd.Parameters.AddWithValue("@debut", debut);
+            cmd.Parameters.AddWithValue("@fin", fin);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Console.WriteLine("Commande" + reader["idCommande"] + " - Date: " + reader["dateCommande"]);
+            }
+        }
+
+
+
+        /// <summary>
+        /// Moyenne des prix des commandes
+        /// </summary>
+
+        public void MoyennePrixCommandes()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            string requete = @"
+            SELECT AVG(p.PrixPersonne * p.NbPersonnes) AS MoyennePrix                 
+            FROM LigneCommande lc
+            JOIN Plat p ON lc.idPlat = p.idPlat; ";
+                                                                                 /// On trouve le prix d'une commande en faisant prix par persoones fois nombre de personnes. Puis on fait la moyenne des prix de toutes les lignes de colonnes
+            using var cmd = new MySqlCommand(requete, connection);
+            using var reader = cmd.ExecuteReader();
+
+            if (reader.Read())
+            {
+                decimal moyenne;
+                if (!reader.IsDBNull(0))                          /// Si il y a une moyenne alors on la lit en décimal, sinon la moyenne est mise à zéro
+                {
+                    moyenne = reader.GetDecimal(0);
+                }
+                else
+                {
+                    moyenne = 0;
+                }
+                Console.WriteLine("\nLa moyenne des prix des commandes est : " + moyenne + " euros");
+            }
+        }
+
+
+
+        /// <summary>
+        /// Moyenne des dépenses par compte client
+        /// </summary>
+        public void MoyenneDepenseParComptesClients()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            string requete = @"
+            SELECT AVG(TotalClient) AS MoyenneParClient                                              
+            FROM (
+            SELECT c.idClient, SUM(p.PrixPersonne * p.NbPersonnes) AS TotalClient
+            FROM Client c
+            JOIN CommandeTransactions cmd ON c.idClient = cmd.idClient
+            JOIN LigneCommande lc ON cmd.idCommande = lc.idCommande
+            JOIN Plat p ON lc.idPlat = p.idPlat
+            GROUP BY c.idClient
+            ) AS SousRequete;"; 
+
+            /// Ici, on a calculé pour chaque ligne de commande le prix de la commande (prixpersonne*nbpersonne), puis pour chaque client on a fait la somme des prix de toutes ses lignes de commandes A LUI, afin de trouver les dépenses par compte clients.
+            /// Enfin, nous avons fait la moyenne de tous ces prix afin d'avoir la moyenne des dépenses par compte client
+
+            using var cmd = new MySqlCommand(requete, connection);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                decimal moyenne;
+                if (!reader.IsDBNull(0))                      /// Même chose ici que pour la méthode précédente
+                {
+                    moyenne = reader.GetDecimal(0);
+                }
+                else
+                {
+                    moyenne = 0;
+                }
+                Console.WriteLine("\nLa moyenne des dépenses par compte client est : " + moyenne + " euros");
+            }
+        }
+
+
+
+        /// <summary>
+        /// Commandes d’un client selon la nationalité de plat et la période
+        /// </summary>
+        /// <param name="idClient"></param>
+        /// <param name="nationalite"></param>
+        /// <param name="debut"></param>
+        /// <param name="fin"></param>
+        public void CommandesSelonPlatEtPeriode(string idClient, string nationalite, DateTime debut, DateTime fin)
+        {
+            Console.WriteLine("\n Commandes d'un client selon la nationalité du plat et la période : ");
+            Console.WriteLine("\n Choisir le client dont vous souhaitez voir cette statistique (sous la forme CLI001 pour le client 1, etc (max=client 8) : ");
+            idClient = Console.ReadLine();
+            Console.WriteLine("Choisir la nationalité du plat (Française) :");
+            nationalite = Console.ReadLine();
+            Console.WriteLine("Saisir la date de début de la période (format année/mois/jours) : ");
+            debut = Convert.ToDateTime(Console.ReadLine());
+            Console.WriteLine("Saisir la date de fin de la période (format année/mois/jours) : ");
+            fin = Convert.ToDateTime(Console.ReadLine());                       /// On demande les informations nécessaires à l'utilisateur
+
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+
+            /// Grâce à la requête on sélectionne la commande qu'on cherche : celle qui respecte toutes nos conditions
+            var cmd = new MySqlCommand("select c.idCommande, c.dateCommande, p.Nationalité, p.NomPlat from CommandeTransactions c join Plat p ON p.idPlat = p.idPlat where c.idClient = @idClient and p.Nationalité = @Nationalité and c.dateCommande between @debut and @fin;", conn);
+            cmd.Parameters.AddWithValue("@idClient", idClient);
+            cmd.Parameters.AddWithValue("@Nationalité", nationalite);
+            cmd.Parameters.AddWithValue("@debut", debut);
+            cmd.Parameters.AddWithValue("@fin", fin);
+            using var reader = cmd.ExecuteReader();           /// On lit la réponse de la requête et on l'affiche
+            while (reader.Read())
+            {
+                Console.WriteLine("Commande" + reader["idCommande"] + " - Date: " + reader["dateCommande"] + " - Nationalité: " + reader["Nationalité"] + " - Nom de Plat : " + reader["NomPlat"]);
+                break;
+            }
+        }
+
+
+        /// **********************************************************AUTRES REQUÊTES************************************************************************
+
+        ///
+        /// <summary>
+        /// Super cuisiniers avec HAVING
+        /// </summary>
+        public void SuperCuisiniers()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+
+            Console.WriteLine("\n Un super cuisinier est un cuisinier avec plus de 4 commandes à son actif :"); 
+            string requete = @"SELECT IdCuisinier, COUNT(*) AS NbCommande
+            FROM CommandeTransactions
+            GROUP BY IdCuisinier
+            HAVING COUNT(*) > 4";
+
+            /// Etre super cuisinier c'est un grade : un cuisinier est super cuisinier s'il a plus de 4 commandes à son actif
+            /// HAVING permet de vérifier si le nombre de commande du cuisinier dépasse ou non 4
+            /// 
+            using var cmd = new MySqlCommand(requete, connection);
+            using var reader = cmd.ExecuteReader();
+            if (reader != null)
+            {
+                while (reader.Read()) Console.WriteLine(reader["IdCuisinier"] + ":" + reader["NbCommande"]);
+                reader.Close();
+            }
+            Console.WriteLine("Il n'y a pas de super cuisinier");
+        }
+
+
+        /// <summary>
+        /// Menus Commandés au moins une fois
+        /// </summary>
+        public void AfficherMenusCommandesAuMoinsUneFois()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            string requete = @"
+            SELECT DISTINCT p.*
+            FROM Plat p
+            JOIN LigneCommande lp ON p.idPlat = lp.idPlat;";
+
+            using var cmd = new MySqlCommand(requete, connection);                                          /// On chercher et on affiche les plats qui apparaissent au moins une fois dans la liste de commandes
+            using var reader = cmd.ExecuteReader();
+            Console.WriteLine("\n Plats commandés au moins une fois :");
+            while (reader.Read())
+            {
+                Console.WriteLine("Plat ID:" + reader["idPlat"] + ", Nom: " + reader["NomPlat"] + ", Prix: " + reader["PrixPersonne"]);
+            }
+            reader.Close();
+        }
+
+
+
+        /// <summary>
+        /// Clients et leurs commande avec LEFT JOIN
+        /// </summary>
+        public void ClientsEtCommandes()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            Console.WriteLine("\n Clients avec leur nombre de commandes :");
+
+            string requete = @"SELECT c.idClient, COUNT(com.idCommande) AS NbCom
+            FROM Client c
+            LEFT JOIN CommandeTransactions com ON c.idClient = com.idClient                        
+            GROUP BY c.idClient";
+            
+            /// La méthode LEFT JOIN permet de regarder le nombre de commandes pour TOUS les clients, même ceux qui n'ont pas effectué de commandes
+            
+            using var cmd = new MySqlCommand(requete, connection);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read()) Console.WriteLine(reader["idClient"] + ":" + reader["NbCom"] + " commande");
+            reader.Close();
+
+        }
+
+
+        /// <summary>
+        /// Nombre de comptes clients par ville avec GROUP BY
+        /// </summary>
+        public void CompterClientsParVille()
+        {
+            Console.WriteLine("\n Nombre de comptes client basés à :");
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+            using var cmd = new MySqlCommand("SELECT Ville, COUNT(*) AS nb_clients FROM Compte GROUP BY Ville;", connection);                /// Pour chaque ville, on regarde combien de comptes client y est associé
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                string Ville = reader["Ville"].ToString();
+                int count = Convert.ToInt32(reader["nb_clients"]);
+                Console.WriteLine("Ville :" + Ville + ", Nombre de clients : " + count);
+            }
+        }
+
+
+        /// <summary>
+        /// Client qui a payé le plat le plus cher
+        /// </summary>
+        public void AfficherClientPlatLePlusCher()
+        {
+            using var connection = new MySqlConnection(_connectionString);
+            connection.Open();
+
+            string requete = @"
+            SELECT c.idClient, p.NomPlat, p.PrixPersonne  
+            FROM CommandeTransactions ct
+            JOIN Client c ON c.idClient = ct.idClient
+            JOIN LigneCommande lc ON lc.idCommande = ct.idCommande
+            JOIN Plat p ON p.idPlat = lc.idPlat
+            WHERE p.PrixPersonne = (SELECT MAX(p2.PrixPersonne)
+            FROM Plat p2); ";
+            /// On a cherché le prix maximum d'un plat en sachant que le plat est relié à une commande, qui est relié à une ligne de commande, qui est relié à un client qui est relié à "CommandeTransaction", la table ou on extrait l'idClient
+
+            using var cmd = new MySqlCommand(requete, connection);
+            using var reader = cmd.ExecuteReader();
+            Console.WriteLine("\n Le client qui a payé le menu le plus cher est :");
+            while (reader.Read())
+            {
+                string client = reader["idClient"].ToString();                         /// On converti en string à la lecture de l'idClient et du nom du plat pour pouvoir l'afficher facilement ensuite
+                string NomPlat = reader["NomPlat"].ToString();
+                decimal prix = (decimal)reader["PrixPersonne"];
+                Console.WriteLine(" Client:" + client + " | Plat: " + NomPlat + " | Prix : " + prix + "euros");
+            }
+            reader.Close();
+        }
+
+    }
+
+}
