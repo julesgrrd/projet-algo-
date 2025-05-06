@@ -275,16 +275,16 @@ namespace ProjetPSI
             #region Partie Import/Export XML/Json
             void PartieImportExport()
             {
-                string connectionString = "SERVER=localhost;PORT=3306;DATABASE=datatables;UID=admin;PASSWORD=admin_password;";
+                string connectionString = "SERVER=localhost;PORT=3306;DATABASE=datatables;UID=admin;PASSWORD=admin_password;";       /// Il s'agit de la connection à la base de données : on se connecte ici en tant qu'administrateur pour avoir un accès libre
 
 
                 /// Création de "service"
-                var service = new ImportExport_XML_Json(connectionString);
+                var service = new ImportExport_XML_Json(connectionString); 
 
                 /// Récupération des commandes depuis la BDD
                 List<Commande> commandes = service.RécupérerCommande();
 
-
+                /// On appelle les fonctions d'import/export en xml/Json et on affiche les lignes de commandes retranscrites dans le cas de l'import
 
                 /// Export JSON
                 service.ExportVersJson("commandes.json");
@@ -315,7 +315,7 @@ namespace ProjetPSI
                 System.Diagnostics.Process.Start("notepad.exe", "commandes.json");
                 System.Diagnostics.Process.Start("notepad.exe", "commandes.xml");
 
-                /// attention a bien supprimer les fichiers du bloc note après visualisation (fermer les deux avec la croix) pour que les fichiers se regénère sans souci à chaque itéraation.
+                /// attention a bien supprimer les fichiers du bloc note après visualisation (fermer les deux avec leur croix respective) pour que les fichiers se regénère sans souci à chaque itéraation.
 
             }
             #endregion
@@ -343,12 +343,14 @@ namespace ProjetPSI
             #region Partie Statistiques
             void PartieStatistiques()
             {
-                string connectionString = "SERVER=localhost;PORT=3306;DATABASE=datatables;UID=admin;PASSWORD=admin_password;";
+                string connectionString = "SERVER=localhost;PORT=3306;DATABASE=datatables;UID=admin;PASSWORD=admin_password;";               /// On se connecte à la base de données en tant qu'administrateur pour avoir autant de liberté qu'on le souhaite
                 Console.WriteLine("\n \n ************************* BIENVENUE DANS LE MENU STATISTIQUES DE L'APPLICATION *************************");
 
                 var stats = new Statistiques(connectionString);
 
+                /// On appelle toutes les requêtes du module statistiques
 
+            
                 /// requêtes obligatoires
                 stats.NombreLivraisonsParCuisinier();
                 stats.CommandeSelonPeriode(new DateTime(), new DateTime());
